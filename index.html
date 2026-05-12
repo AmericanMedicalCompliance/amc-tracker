@@ -404,7 +404,7 @@ tr:hover td{background:var(--surface2)}
       </div>
       <div id="customFrom" style="display:none;min-width:130px"><label style="font-size:11px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px">From</label><input type="date" id="rptFrom"/></div>
       <div id="customTo" style="display:none;min-width:130px"><label style="font-size:11px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px">To</label><input type="date" id="rptTo"/></div>
-      <div style="min-width:160px"><label style="font-size:11px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px">Employee</label><select id="rptUser"><option value="">All employees</option></select></div>
+      <div style="min-width:160px"><label style="font-size:11px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px">Employee</label><select id="rptUser"><option value="">All users</option></select></div>
       <button class="btn btn-primary" onclick="runReport()">Run report</button>
       <button class="btn" onclick="exportCSV()">Export CSV</button>
     </div>
@@ -419,14 +419,14 @@ tr:hover td{background:var(--surface2)}
       <div class="metric"><div class="metric-label">Leave taken</div><div class="metric-value" id="rs-lv">0d</div></div>
     </div>
     <div class="card">
-      <div class="card-title">Attendance per employee</div>
+      <div class="card-title">Attendance per user</div>
       <div class="table-wrap"><table>
         <thead><tr><th style="width:30px"></th><th>Employee</th><th>Present</th><th>Absent</th><th>Leave</th><th>Total hrs</th><th>Avg/day</th><th>Status</th></tr></thead>
         <tbody id="rptTable"></tbody>
       </table></div>
     </div>
     <div class="card"><div class="card-title">Attendance heatmap</div><div id="heatmapWrap"></div></div>
-    <div class="card"><div class="card-title">Hours by employee</div><div style="position:relative;width:100%" id="rptBarWrap"><canvas id="rptBarChart" role="img" aria-label="Hours per employee bar chart">No data.</canvas></div></div>
+    <div class="card"><div class="card-title">Hours by user</div><div style="position:relative;width:100%" id="rptBarWrap"><canvas id="rptBarChart" role="img" aria-label="Hours per user bar chart">No data.</canvas></div></div>
   </div>
   <div id="rptEmpty" style="text-align:center;padding:40px;color:var(--text3);font-size:13px">Select a period and click Run report.</div>
 </div>
@@ -443,7 +443,7 @@ tr:hover td{background:var(--surface2)}
   <div class="card">
     <div class="card-title">Leave log
       <div class="btn-group">
-        <select id="lvUFilt" style="font-size:12px;padding:5px 24px 5px 9px" onchange="renderLeaveLog()"><option value="">All employees</option></select>
+        <select id="lvUFilt" style="font-size:12px;padding:5px 24px 5px 9px" onchange="renderLeaveLog()"><option value="">All users</option></select>
         <select id="lvTFilt" style="font-size:12px;padding:5px 24px 5px 9px" onchange="renderLeaveLog()"><option value="">All types</option><option>Vacation</option><option>Sick</option><option>Personal</option><option>Unpaid</option></select>
       </div>
     </div>
@@ -456,7 +456,7 @@ tr:hover td{background:var(--surface2)}
 
 <!-- ADMIN PAGE -->
 <div class="page" id="page-admin">
-  <div class="page-header"><div class="page-title">Users & admin</div><div class="page-sub">Manage employees, sessions, and approvals</div></div>
+  <div class="page-header"><div class="page-title">Users & admin</div><div class="page-sub">Manage remote team, sessions, and approvals</div></div>
   <div class="inner-tabs">
     <button class="inner-tab active" onclick="showInner('admin','users')">Users</button>
     <button class="inner-tab" onclick="showInner('admin','depts')">Departments</button>
@@ -469,7 +469,7 @@ tr:hover td{background:var(--surface2)}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
       <div class="btn-group">
         <select id="uDeptF" style="font-size:12px;padding:5px 24px 5px 9px" onchange="renderUsers()"><option value="">All depts</option></select>
-        <select id="uRoleF" style="font-size:12px;padding:5px 24px 5px 9px" onchange="renderUsers()"><option value="">All roles</option><option>admin</option><option>manager</option><option>employee</option></select>
+        <select id="uRoleF" style="font-size:12px;padding:5px 24px 5px 9px" onchange="renderUsers()"><option value="">All roles</option><option>admin</option><option>manager</option><option value="employee">User</option></select>
       </div>
       <button class="btn btn-success" onclick="openModal('addUser')">+ Add user</button>
     </div>
@@ -532,7 +532,7 @@ tr:hover td{background:var(--surface2)}
   <div class="inner-sec" id="titles-leavepolicy">
     <div class="metric-grid">
       <div class="metric"><div class="metric-label">Paid holidays</div><div class="metric-value" id="lp-paid">7</div><div class="metric-sub">company-wide</div></div>
-      <div class="metric"><div class="metric-label">Personal leave</div><div class="metric-value">12</div><div class="metric-sub">per employee/year</div></div>
+      <div class="metric"><div class="metric-label">Personal leave</div><div class="metric-value">12</div><div class="metric-sub">per user/year</div></div>
       <div class="metric"><div class="metric-label">Unpaid holidays</div><div class="metric-value" id="lp-unpaid">6</div><div class="metric-sub">observed</div></div>
       <div class="metric"><div class="metric-label">Total paid days</div><div class="metric-value" id="lp-total">19</div><div class="metric-sub">holidays + leave</div></div>
     </div>
@@ -644,18 +644,17 @@ let departments = [
 ];
 
 let shifts = [
-  {id:1,name:'Day',start:'08:00',end:'16:00',days:['Mon','Tue','Wed','Thu','Fri']},
-  {id:2,name:'Evening',start:'16:00',end:'00:00',days:['Mon','Tue','Wed','Thu','Fri']},
-  {id:3,name:'Night',start:'00:00',end:'08:00',days:['Mon','Tue','Wed','Thu','Fri']},
-  {id:4,name:'Weekend',start:'08:00',end:'20:00',days:['Sat','Sun']},
+  {id:1,name:'Full Timer',start:'09:00',end:'17:00',days:['Mon','Tue','Wed','Thu','Fri']},
+  {id:2,name:'Part Timer',start:'09:00',end:'13:00',days:['Mon','Tue','Wed','Thu','Fri']},
+  {id:3,name:'Flexible',start:'',end:'',days:['Mon','Tue','Wed','Thu','Fri','Sat','Sun']},
 ];
 
 let rolePerms = {
   admin:{label:'Admin',perms:{view_all:true,edit_users:true,delete_users:true,approve_leave:true,adjust_time:true,view_reports:true,manage_depts:true,manage_shifts:true,config_alerts:true,push_n8n:true}},
   manager:{label:'Manager',perms:{view_all:true,edit_users:false,delete_users:false,approve_leave:true,adjust_time:true,view_reports:true,manage_depts:false,manage_shifts:false,config_alerts:false,push_n8n:false}},
-  employee:{label:'Employee',perms:{view_all:false,edit_users:false,delete_users:false,approve_leave:false,adjust_time:false,view_reports:false,manage_depts:false,manage_shifts:false,config_alerts:false,push_n8n:false}},
+  employee:{label:'User',perms:{view_all:false,edit_users:false,delete_users:false,approve_leave:false,adjust_time:false,view_reports:false,manage_depts:false,manage_shifts:false,config_alerts:false,push_n8n:false}},
 };
-const PERM_LABELS = {view_all:'View all employee data',edit_users:'Edit user profiles',delete_users:'Delete users',approve_leave:'Approve leave requests',adjust_time:'Adjust time records',view_reports:'View reports',manage_depts:'Manage departments',manage_shifts:'Manage shifts',config_alerts:'Configure HR alerts',push_n8n:'Push to n8n'};
+const PERM_LABELS = {view_all:'View all user data',edit_users:'Edit user profiles',delete_users:'Delete users',approve_leave:'Approve leave requests',adjust_time:'Adjust time records',view_reports:'View reports',manage_depts:'Manage departments',manage_shifts:'Manage shifts',config_alerts:'Configure HR alerts',push_n8n:'Push to n8n'};
 
 let users = [
   {id:1,name:'Admin User',email:'admin@americanmedical.com',role:'admin',pin:'0000',color:0,dept:2,shift:1,invited:true,status:'active',phone:'555-0100',jobTitle:'CISO and Director of HR',startDate:'2020-01-15',leaveBalance:{vacation:6,sick:4,personal:2, password: "Admin@123!", needsSetup: false},manager:null, password: "Admin@123!", needsSetup: false},
@@ -709,7 +708,7 @@ function doLogin(){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='flex';
   document.getElementById('sidebarName').textContent = u.name;
-  document.getElementById('sidebarRole').textContent = u.role==='admin'?'Administrator':u.role==='manager'?'Manager':'Employee';
+  document.getElementById('sidebarRole').textContent = u.role==='admin'?'Administrator':u.role==='manager'?'Manager':'User';
   const av = document.getElementById('sidebarAv');
   av.textContent = ini(u.name); av.style.cssText = avStyle(u.color);
   if(u.role==='admin'||u.role==='manager'){
@@ -865,7 +864,7 @@ function renderInsights(){
 function populateRptUsers(){
   const el=document.getElementById('rptUser'); const cv=el.value;
   const emps=cu.role==='admin'?users.filter(u=>u.role!=='admin'):cu.role==='manager'?users.filter(u=>u.role==='employee'):[cu];
-  el.innerHTML='<option value="">All employees</option>'+emps.map(u=>`<option value="${u.id}"${cv==u.id?' selected':''}>${u.name}</option>`).join('');
+  el.innerHTML='<option value="">All users</option>'+emps.map(u=>`<option value="${u.id}"${cv==u.id?' selected':''}>${u.name}</option>`).join('');
 }
 
 function applyRange(){
@@ -958,7 +957,7 @@ function exportCSV(){
 function populateLvFilter(){
   const el=document.getElementById('lvUFilt'); const cv=el.value;
   const emps=cu.role==='admin'?users:users.filter(u=>u.id===cu.id);
-  el.innerHTML='<option value="">All employees</option>'+emps.map(u=>`<option value="${u.id}"${cv==u.id?' selected':''}>${u.name}</option>`).join('');
+  el.innerHTML='<option value="">All users</option>'+emps.map(u=>`<option value="${u.id}"${cv==u.id?' selected':''}>${u.name}</option>`).join('');
 }
 
 function renderLeaveBalances(){
@@ -1048,7 +1047,7 @@ function renderUsers(){
 function sendInvite(uid){
   const u=users.find(x=>x.id===uid); if(!u)return;
   const sub=encodeURIComponent('You are invited to install AMC Time Tracker');
-  const body=encodeURIComponent(`Hi ${u.name},\n\nYou have been added to the AMC Time Tracker.\n\nAccess the tracker here:\n${window.location.href}\n\nYour login credentials:\n  Select your name from the dropdown\n  PIN: ${u.pin}\n\nFor the desktop installer:\n${SHAREPOINT}\n\nAmerican Medical Compliance — HR`);
+  const body=encodeURIComponent(`Hi ${u.name},\n\nYou have been added to the AMC Time Tracker as a remote team member.\n\nAccess the tracker here:\n${window.location.href}\n\nYour login credentials:\n  Email: ${u.email}\n  A verification code will be sent to your email on first sign-in.\n\nAmerican Medical Compliance — HR`);
   window.open(`mailto:${u.email}?subject=${sub}&body=${body}`);
   u.invited=true; addAudit(cu.id,'Invite sent','User',`Invite sent to ${u.email}`); renderUsers();
 }
@@ -1074,7 +1073,7 @@ function renderShifts(){
   document.getElementById('shiftList').innerHTML=shifts.map(s=>{
     const count=users.filter(u=>u.shift===s.id).length;
     return `<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--border)">
-      <div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:13px;font-weight:500">${s.name}</span><span class="badge badge-blue">${s.start} – ${s.end}</span></div><div style="display:flex;gap:4px;flex-wrap:wrap">${s.days.map(d=>`<span class="badge badge-gray">${d}</span>`).join('')}</div><div style="font-size:11px;color:var(--text2);margin-top:3px">${count} employees</div></div>
+      <div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:13px;font-weight:500">${s.name}</span><span class="badge badge-blue">${s.start} – ${s.end}</span></div><div style="display:flex;gap:4px;flex-wrap:wrap">${s.days.map(d=>`<span class="badge badge-gray">${d}</span>`).join('')}</div><div style="font-size:11px;color:var(--text2);margin-top:3px">${count} users</div></div>
       <div class="btn-group"><button class="btn btn-sm" onclick="openModal('editShift',${s.id})">Edit</button><button class="btn btn-sm btn-danger" onclick="removeShift(${s.id})">Del</button></div>
     </div>`;
   }).join('');
@@ -1222,7 +1221,7 @@ function calcAlerts(){
 function runAlerts(){
   activeAlerts=calcAlerts();
   const el=document.getElementById('alertList');
-  if(!activeAlerts.length){ el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">No alerts — all employees meeting thresholds.</div>'; return; }
+  if(!activeAlerts.length){ el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">No alerts — all users meeting thresholds.</div>'; return; }
   el.innerHTML=activeAlerts.map(a=>{
     const [bg,fg,sym]={warn:['#FFFBEB','#92400E','!'],alert:['#FEF2F2','#991B1B','!!']}[a.sev];
     return `<div class="alert-item">
@@ -1235,7 +1234,7 @@ function runAlerts(){
 
 async function saveWH(){ const v=document.getElementById('whUrl').value.trim(); if(!v){alert('Enter URL.');return;} webhookUrl=v; const sp=document.getElementById('whSt'); sp.className='badge badge-teal'; sp.textContent='Saved'; addAudit(cu.id,'Webhook saved','System','n8n webhook configured'); }
 async function testWH(){ if(!webhookUrl){alert('Save URL first.');return;} const sp=document.getElementById('whSt'); sp.className='badge badge-amber'; sp.textContent='Pinging...'; try{ await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'ping',source:'AMC Time Tracker',ts:new Date().toISOString()})}); sp.className='badge badge-teal'; sp.textContent='Ping OK'; }catch(e){ sp.className='badge badge-red'; sp.textContent='Failed'; } }
-async function pushAlerts(){ if(!webhookUrl){alert('Save webhook URL first.');return;} if(!activeAlerts.length){document.getElementById('pushSt').textContent='No alerts to push.';return;} document.getElementById('pushSt').textContent='Sending...'; try{ await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source:'AMC Time Tracker',timestamp:new Date().toISOString(),alert_count:activeAlerts.length,alerts:activeAlerts.map(a=>({employee:a.name,type:a.type,severity:a.sev,message:a.msg,ts:new Date().toISOString()}))})}); document.getElementById('pushSt').textContent=activeAlerts.length+' alerts pushed'; addAudit(cu.id,'Alerts pushed','System',activeAlerts.length+' HR alerts sent to n8n'); }catch(e){ document.getElementById('pushSt').textContent='Push failed — check URL'; } }
+async function pushAlerts(){ if(!webhookUrl){alert('Save webhook URL first.');return;} if(!activeAlerts.length){document.getElementById('pushSt').textContent='No alerts to push.';return;} document.getElementById('pushSt').textContent='Sending...'; try{ await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source:'AMC Time Tracker',timestamp:new Date().toISOString(),alert_count:activeAlerts.length,alerts:activeAlerts.map(a=>({user:a.name,type:a.type,severity:a.sev,message:a.msg,ts:new Date().toISOString()}))})}); document.getElementById('pushSt').textContent=activeAlerts.length+' alerts pushed'; addAudit(cu.id,'Alerts pushed','System',activeAlerts.length+' HR alerts sent to n8n'); }catch(e){ document.getElementById('pushSt').textContent='Push failed — check URL'; } }
 
 // ── AUDIT ─────────────────────────────────────────────────────────────────────
 function buildAuditFilters(){ const el=document.getElementById('audUser'); const cv=el.value; el.innerHTML='<option value="">All users</option>'+users.map(u=>`<option value="${u.id}"${cv==u.id?' selected':''}>${u.name}</option>`).join(''); }
@@ -1274,14 +1273,13 @@ function openModal(mode,id){
       <div class="form-grid">
         <div class="form-row"><label>Full name</label><input type="text" id="f-n" value="${u?u.name:''}"/></div>
         <div class="form-row"><label>Work email</label><input type="email" id="f-e" value="${u?u.email:''}"/></div>
-        <div class="form-row"><label>Phone</label><input type="text" id="f-ph" value="${u?u.phone||'':''}"/></div>
         <div class="form-row"><label>Job title</label><select id="f-jt"><option value="">— select —</option>${titles.map(t=>`<option value="${t}"${u?.jobTitle===t?' selected':''}>${t}</option>`).join('')}</select></div>
         <div class="form-row"><label>Start date</label><input type="date" id="f-sd" value="${u?u.startDate||'':todayStr()}"/></div>
         <div class="form-row"><label>Status</label><select id="f-st"><option value="active"${u?.status==='active'?' selected':''}>Active</option><option value="on_leave"${u?.status==='on_leave'?' selected':''}>On leave</option><option value="inactive"${u?.status==='inactive'?' selected':''}>Inactive</option></select></div>
       </div>
       <div class="section-divider">Role & access</div>
       <div class="form-grid">
-        <div class="form-row"><label>Role</label><select id="f-r"><option value="employee"${u?.role==='employee'?' selected':''}>Employee</option><option value="manager"${u?.role==='manager'?' selected':''}>Manager</option><option value="admin"${u?.role==='admin'?' selected':''}>Admin</option></select></div>
+        <div class="form-row"><label>Role</label><select id="f-r"><option value="employee"${u?.role==='employee'?' selected':''}>User</option><option value="manager"${u?.role==='manager'?' selected':''}>Manager</option><option value="admin"${u?.role==='admin'?' selected':''}>Admin</option></select></div>
         <div class="form-row"><label>Department</label><select id="f-d">${departments.map(d=>`<option value="${d.id}"${u?.dept===d.id?' selected':''}>${d.name}</option>`).join('')}</select></div>
         <div class="form-row"><label>Shift</label><select id="f-sh">${shifts.map(s=>`<option value="${s.id}"${u?.shift===s.id?' selected':''}>${s.name}</option>`).join('')}</select></div>
         <div class="form-row"><label>Manager</label><select id="f-mgr"><option value="">None</option>${users.filter(x=>x.role!=='employee').map(x=>`<option value="${x.id}"${u?.manager===x.id?' selected':''}>${x.name}</option>`).join('')}</select></div>
@@ -1304,7 +1302,7 @@ function openModal(mode,id){
     body=`<div style="text-align:center;margin-bottom:20px"><div class="av av-lg" style="${avStyle(u.color)};margin:0 auto 10px">${ini(u.name)}</div><div style="font-size:16px;font-weight:600">${u.name}</div><div style="font-size:13px;color:var(--text2);margin-top:2px">${u.jobTitle||''}</div></div>
     <table style="width:100%;font-size:13px">
       <tr><td style="color:var(--text2);padding:5px 0;width:110px">Email</td><td style="color:var(--blue)">${u.email}</td></tr>
-      <tr><td style="color:var(--text2);padding:5px 0">Phone</td><td>${u.phone||'—'}</td></tr>
+      
       <tr><td style="color:var(--text2);padding:5px 0">Department</td><td>${dept?dept.name:'—'}</td></tr>
       <tr><td style="color:var(--text2);padding:5px 0">Shift</td><td>${shift?shift.name:'—'}</td></tr>
       <tr><td style="color:var(--text2);padding:5px 0">Manager</td><td>${mgr?mgr.name:'—'}</td></tr>
@@ -1375,7 +1373,7 @@ function doModal(){
     const name=document.getElementById('f-n').value.trim(); const email=document.getElementById('f-e').value.trim();
     const role=document.getElementById('f-r').value; const pin=document.getElementById('f-p').value;
     if(!name||!pin){alert('Name and PIN required.');return;}
-    const nu={id:nuid++,name,email,role,pin,color:users.length%6,dept:+document.getElementById('f-d').value,shift:+document.getElementById('f-sh').value,manager:+document.getElementById('f-mgr').value||null,invited:false,status:document.getElementById('f-st').value,phone:document.getElementById('f-ph').value,jobTitle:document.getElementById('f-jt').value,startDate:document.getElementById('f-sd').value,leaveBalance:{vacation:+document.getElementById('f-lv').value,sick:+document.getElementById('f-ls').value,personal:+document.getElementById('f-lp').value}};
+    const nu={id:nuid++,name,email,role,pin,color:users.length%6,dept:+document.getElementById('f-d').value,shift:+document.getElementById('f-sh').value,manager:+document.getElementById('f-mgr').value||null,invited:false,status:document.getElementById('f-st').value,jobTitle:document.getElementById('f-jt').value,startDate:document.getElementById('f-sd').value,leaveBalance:{vacation:+document.getElementById('f-lv').value,sick:+document.getElementById('f-ls').value,personal:+document.getElementById('f-lp').value}};
     users.push(nu); addAudit(cu.id,'User added','User',`Added ${name} (${role})`); closeModal(); renderUsers(); buildDeptFilter();
     if(document.getElementById('f-inv')?.checked) sendInvite(nu.id);
 
@@ -1385,8 +1383,7 @@ function doModal(){
     u.email=document.getElementById('f-e').value.trim()||u.email;
     u.role=document.getElementById('f-r').value; u.dept=+document.getElementById('f-d').value;
     u.shift=+document.getElementById('f-sh').value; u.manager=+document.getElementById('f-mgr').value||null;
-    u.status=document.getElementById('f-st').value; u.phone=document.getElementById('f-ph').value;
-    u.jobTitle=document.getElementById('f-jt').value; u.startDate=document.getElementById('f-sd').value;
+    u.status=document.getElementById('f-st').value; u.jobTitle=document.getElementById('f-jt').value; u.startDate=document.getElementById('f-sd').value;
     const np=document.getElementById('f-p').value; if(np) u.pin=np;
     u.leaveBalance={vacation:+document.getElementById('f-lv').value,sick:+document.getElementById('f-ls').value,personal:+document.getElementById('f-lp').value};
     addAudit(cu.id,'User edited','User',`Updated ${u.name}`); closeModal(); renderUsers();
