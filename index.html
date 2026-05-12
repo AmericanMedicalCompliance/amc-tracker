@@ -1480,17 +1480,13 @@ function doModal(){
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 let ndid=departments.length+1;
-buildLoginSelect();
+/* buildLoginSelect() - replaced by email login UI */;
 
 
 // ==================== AMC NEW AUTH SYSTEM ====================
 
 // User database with email/password
-var users = [
-  { id: 1, name: 'Admin', email: 'admin@americanmedical.com', password: 'Admin@123!', role: 'admin', dept: 'Management', color: '#4a86a8', needsSetup: false },
-  { id: 2, name: 'Dr. Johnson', email: 'johnson@americanmedical.com', password: '', role: 'staff', dept: 'Clinical', color: '#27ae60', needsSetup: true },
-  { id: 3, name: 'Sarah Mitchell', email: 'mitchell@americanmedical.com', password: '', role: 'staff', dept: 'HR', color: '#e74c3c', needsSetup: true }
-];
+// Using original app users array (extended with password/needsSetup fields above)
 
 var _pendingLoginUser = null;
 var _currentOTP = null;
@@ -1683,10 +1679,37 @@ function completeSetup() {
 }
 
 function completeLogin(user) {
-  activeUser = user;
+  // Set the user in the original app's expected way
+  var u = user;
+  
+  // Hide login screen
   var ls = document.getElementById('loginScreen');
   if (ls) ls.style.display = 'none';
-  renderApp();
+  
+  // Show app shell (original app pattern)
+  var appShell = document.getElementById('appShell');
+  if (appShell) appShell.style.display = '';
+  
+  // Update sidebar with user info
+  var sidebarName = document.getElementById('sidebarName');
+  var sidebarRole = document.getElementById('sidebarRole');
+  var sidebarAv = document.getElementById('sidebarAv');
+  if (sidebarName && u) sidebarName.textContent = u.name || '';
+  if (sidebarRole && u) sidebarRole.textContent = (u.role || '') + (u.dept ? ' — ' + u.dept : '');
+  if (sidebarAv && u) { sidebarAv.textContent = (u.name || 'U').charAt(0); sidebarAv.style.background = u.color || '#4a86a8'; }
+  
+  // Set tracker date
+  var trackerDate = document.getElementById('trackerDate');
+  if (trackerDate) trackerDate.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  
+  // Store current user reference for the original app  
+  window._currentUser = u;
+  
+  // Call original app's post-login init if available
+  if (typeof startTimer === 'function') startTimer();
+  if (typeof goTo === 'function') goTo('dashboard');
+  
+  // Start idle tracking
   startIdleTracking();
 }
 
@@ -1807,23 +1830,48 @@ function loadMS365Data() {
 // Override existing doLogout to include idle tracking cleanup
 var _originalDoLogout = typeof doLogout === 'function' ? doLogout : null;
 function doLogout() {
+  // Stop idle tracking
   stopIdleTracking();
-  activeUser = null;
+  
+  // Clear user session
+  window._currentUser = null;
+  _pendingLoginUser = null;
+  _currentOTP = null;
+  
+  // Stop any running timer
+  if (typeof stopTimer === 'function') stopTimer();
+  
+  // Hide app shell
+  var appShell = document.getElementById('appShell');
+  if (appShell) appShell.style.display = 'none';
+  
+  // Hide idle overlay
+  var idleOverlay = document.getElementById('idleWarningOverlay');
+  if (idleOverlay) idleOverlay.style.display = 'none';
+  
+  // Hide MS365 panel
+  var ms365Panel = document.getElementById('ms365Panel');
+  if (ms365Panel) ms365Panel.style.display = 'none';
+  
+  // Show our new login screen
   var ls = document.getElementById('loginScreen');
   if (ls) {
     ls.style.display = 'flex';
-    document.getElementById('loginStep1').style.display = 'block';
-    document.getElementById('loginStep2').style.display = 'none';
-    document.getElementById('loginStep3').style.display = 'none';
+    // Reset to step 1
+    var s1 = document.getElementById('loginStep1');
+    var s2 = document.getElementById('loginStep2');
+    var s3 = document.getElementById('loginStep3');
+    if (s1) s1.style.display = 'block';
+    if (s2) s2.style.display = 'none';
+    if (s3) s3.style.display = 'none';
+    // Clear inputs
     var emailEl = document.getElementById('loginEmail');
     var pwdEl = document.getElementById('loginPassword');
+    var errEl = document.getElementById('loginError');
     if (emailEl) emailEl.value = '';
     if (pwdEl) pwdEl.value = '';
+    if (errEl) { errEl.textContent = ''; errEl.style.display = 'none'; }
   }
-  var ms365Panel = document.getElementById('ms365Panel');
-  if (ms365Panel) ms365Panel.style.display = 'none';
-  _pendingLoginUser = null;
-  _currentOTP = null;
 }
 
 // Show login on load
@@ -1834,6 +1882,17 @@ window.addEventListener('DOMContentLoaded', function() {
 
 // ==================== END AMC NEW AUTH SYSTEM ====================
 
+
+// Expose auth functions to window scope for onclick handlers
+window.doEmailLogin = doEmailLogin;
+window.verifyOtp = verifyOtp;
+window.resendOtp = resendOtp;
+window.completeSetup = completeSetup;
+window.togglePwdVis = togglePwdVis;
+window.resetIdle = resetIdle;
+window.doLogout = doLogout;
+window.toggleMS365 = toggleMS365;
+window.connectMS365 = connectMS365;
 </script>
 
 <div id="idleWarningOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
