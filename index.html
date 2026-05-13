@@ -253,7 +253,7 @@ tr:hover td{background:var(--surface2)}
         <div id="pwdStrength" style="font-size:12px;margin-top:4px;height:16px;"></div>
       </div>
       <div id="loginError" style="color:#e74c3c;font-size:13px;margin-bottom:12px;display:none;"></div>
-      <button onclick="handleLoginContinue()" style="width:100%;background:#4a86a8;color:white;border:none;padding:14px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">Continue</button>
+      <button id="loginContinueBtn" onclick="handleLoginContinue()" style="width:100%;background:#4a86a8;color:white;border:none;padding:14px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">Continue</button>
     </div>
     
     <!-- Step 2: OTP Verification -->
@@ -1590,7 +1590,7 @@ function handleLoginContinue(){
     return;
   }
   if(pwdGroup)pwdGroup.style.display='block';
-  var btn=document.querySelector('#loginStep1 button[onclick*="handleLoginContinue"]');
+  var btn=document.getElementById('loginContinueBtn');
   if(btn)btn.textContent='Sign In';
   var pwdEl=document.getElementById('loginPassword');
   if(pwdEl)setTimeout(function(){pwdEl.focus();},50);
@@ -1914,7 +1914,7 @@ function doLogout() {
     var pwdEl = document.getElementById('loginPassword');
     var errEl = document.getElementById('loginError');
     var pwdGroup = document.getElementById('loginPwdGroup');
-    var continueBtn = document.querySelector('#loginStep1 button');
+    var continueBtn = document.getElementById('loginContinueBtn');
     if (emailEl) emailEl.value = '';
     if (pwdEl) pwdEl.value = '';
     if (errEl) { errEl.textContent = ''; errEl.style.display = 'none'; }
