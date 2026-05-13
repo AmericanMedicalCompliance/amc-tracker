@@ -1771,45 +1771,34 @@ function toggleMS365() {
 }
 
 function connectMS365() {
-  var btn = document.getElementById('ms365ConnectBtn');
-  if (btn) btn.textContent = 'Connecting...';
-  
-  // MSAL.js OAuth flow
+  var redirectUri = location.origin + location.pathname;
+  if (redirectUri.slice(-1) !== '/') redirectUri += '/';
   var authUrl = 'https://login.microsoftonline.com/' + MS365_CONFIG.tenantId + 
     '/oauth2/v2.0/authorize?client_id=' + MS365_CONFIG.clientId +
-    '&response_type=token&redirect_uri=' + encodeURIComponent(location.origin) +
+    '&response_type=token' +
+    '&redirect_uri=' + encodeURIComponent(redirectUri) +
     '&scope=' + encodeURIComponent(MS365_CONFIG.scopes.join(' ')) +
-    '&response_mode=fragment';
-  
-  // Open OAuth popup - token returned in fragment
-  var popup = window.open(authUrl, 'ms365auth', 'width=520,height=640,scrollbars=yes');
-  
-  // Poll for token in popup URL
-  var pollTimer = setInterval(function() {
-    try {
-      if (!popup || popup.closed) {
-        clearInterval(pollTimer);
-        if (btn) btn.textContent = 'Connect Microsoft 365';
-        return;
-      }
-      var popupUrl = popup.location.href;
-      if (popupUrl && popupUrl.indexOf('access_token=') > -1) {
-        clearInterval(pollTimer);
-        popup.close();
-        var hash = popupUrl.split('#')[1] || '';
-        var params = {};
-        hash.split('&').forEach(function(p) {
-          var parts = p.split('=');
-          params[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1] || '');
-        });
-        if (params.access_token) {
-          onMS365Connected(params.access_token);
-        }
-      }
-    } catch(e) {
-      // Cross-origin error means still on Microsoft login page - keep polling
-    }
-  }, 500);
+    '&response_mode=fragment' +
+    '&state=ms365auth';
+  try { localStorage.setItem('ms365_auth_pending', '1'); } catch(e) {}
+  location.href = authUrl;
+}
+
+function checkMS365AuthReturn() {
+  var hash = location.hash || '';
+  if (hash.indexOf('access_token=') === -1) return;
+  var params = {};
+  hash.replace(/^#/, '').split('&').forEach(function(p) {
+    var kv = p.split('=');
+    if (kv.length >= 2) params[decodeURIComponent(kv[0])] = decodeURIComponent(kv.slice(1).join('='));
+  });
+  if (params.access_token) {
+    history.replaceState(null, '', location.pathname);
+    try { localStorage.removeItem('ms365_auth_pending'); } catch(e) {}
+    var panel = document.getElementById('ms365Panel');
+    if (panel) panel.style.display = 'block';
+    onMS365Connected(params.access_token);
+  }
 }
 
 function onMS365Connected(token) {
@@ -1920,7 +1909,8 @@ window.resetIdle = resetIdle;
 window.doLogout = doLogout;
 window.toggleMS365 = toggleMS365;
 window.connectMS365 = connectMS365;
-</script>
+window.checkMS365AuthReturn = checkMS365AuthReturn;
+setTimeout(function(){ if(typeof checkMS365AuthReturn==='function') checkMS365AuthReturn(); }, 600);</script>
 
 <div id="idleWarningOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:white;border-radius:16px;padding:40px;text-align:center;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,0.3);">
