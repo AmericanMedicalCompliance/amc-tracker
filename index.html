@@ -371,10 +371,6 @@ tr:hover td{background:var(--surface2)}
 <div class="page" id="page-activity">
   <div class="page-header"><div class="page-title">Activity log</div><div class="page-sub">All your tracked sessions</div></div>
 
-  <div id="adminViewBar" style="margin-bottom:12px;display:none;align-items:center;gap:10px">
-    <label style="font-size:13px;font-weight:500;white-space:nowrap">Viewing:</label>
-    <select id="adminViewUser" onchange="renderActivity()" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;max-width:260px"></select>
-  </div>
   <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
     <button class="btn btn-outline" id="logTimeBtnAct" onclick="openManualTimeModal()" style="font-size:13px;padding:6px 14px">+ Log time manually</button>
   </div>  <div class="card" id="activityList"><div style="text-align:center;padding:32px;color:var(--text3)">No sessions yet. Start tracking to see your activity here.</div></div>
@@ -932,7 +928,39 @@ function stopTimer(){
   document.getElementById('statusText').textContent='Not tracking';
   document.getElementById('ssLabel').textContent='';
   document.getElementById('permNotice').style.display='';
+  saveSessions();
   updateMetrics(); renderActivity();
+}
+
+// ── SESSION PERSISTENCE ──────────────────────────────────────────────────────
+function saveSessions(){
+  try {
+    // Save sessions without screenshots (too large for localStorage)
+    var toSave = sessions.map(function(s){
+      return {id:s.id,uid:s.uid,project:s.project,category:s.category,start:s.start,duration:s.duration,date:s.date,type:s.type||'tracked',manual:s.manual||false,screenshots:[]};
+    });
+    localStorage.setItem('amc_sessions', JSON.stringify(toSave));
+    if(nsid > 1) localStorage.setItem('amc_nsid', String(nsid));
+  } catch(e){ console.warn('saveSessions error',e); }
+}
+function loadSessions(){
+  try {
+    var saved = JSON.parse(localStorage.getItem('amc_sessions')||'[]');
+    if(saved.length){
+      var existingIds = sessions.map(function(s){return s.id;});
+      saved.forEach(function(s){
+        if(!existingIds.includes(s.id)){
+          s.screenshots = s.screenshots||[];
+          if(s.start) s.start = new Date(s.start);
+          sessions.push(s);
+        }
+      });
+      var maxId = saved.reduce(function(m,s){return Math.max(m,s.id);},0);
+      if(maxId >= nsid) nsid = maxId + 1;
+    }
+    var savedNsid = parseInt(localStorage.getItem('amc_nsid')||'0');
+    if(savedNsid >= nsid) nsid = savedNsid + 1;
+  } catch(e){ console.warn('loadSessions error',e); }
 }
 
 function updateMetrics(){
@@ -951,66 +979,110 @@ const CAT_BADGE = {Work:'badge-teal',Design:'badge-blue',Dev:'badge-blue',Meetin
 
 function renderActivity(){
   const el=document.getElementById('activityList'); if(!cu) return;
-  // Admin: show/populate user selector
   const isAdmin = cu.role==='admin';
-  const adminBar = document.getElementById('adminViewBar');
   const logBtn = document.getElementById('logTimeBtnAct');
-  if(adminBar){ adminBar.style.display = isAdmin ? 'flex' : 'none'; }
   if(logBtn){ logBtn.style.display = isAdmin ? 'none' : ''; }
-  let viewUid = cu.id;
   if(isAdmin){
-    const sel = document.getElementById('adminViewUser');
-    if(sel){
-      if(!sel.options.length || sel.dataset.populated!=='1'){
-        sel.innerHTML = users.map(u=>'<option value="'+u.id+'">'+(u.name)+' ('+u.role+')</option>').join('');
-        sel.dataset.populated='1';
+    // Admin: show ALL users' sessions grouped by user (no dropdown needed)
+    const allUsers = users.filter(function(u){return u.id;});
+    let html = '';
+    allUsers.forEach(function(u){
+      const uSessions = [...sessions.filter(function(s){return s.uid===u.id;})].reverse();
+      const totalSecs = uSessions.reduce(function(a,s){return a+(s.duration||0);},0);
+      html += '<div style="margin-bottom:20px"><div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)">';
+      html += '<div style="width:36px;height:36px;border-radius:50%;background:#4a86a8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;flex-shrink:0">'+((u.name||u.email||'U')[0]).toUpperCase()+'</div>';
+      html += '<div style="flex:1"><div style="font-size:14px;font-weight:600;color:var(--text)">'+(u.name||u.email)+'</div><div style="font-size:12px;color:var(--text2)">'+(u.dept||u.role||'')+'</div></div>';
+      html += '<div style="font-family:var(--mono);font-size:13px;color:var(--text2)">Total: '+fmtHM(totalSecs)+'</div></div>';
+      if(!uSessions.length){
+        html += '<div style="text-align:center;padding:16px;color:var(--text3);font-size:13px">No sessions yet.</div>';
+      } else {
+        html += '<div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">';
+        html += uSessions.map(function(s){
+          const ds=s.start?new Date(s.start).toLocaleDateString([],{month:'short',day:'numeric'}):'';
+          const ts=s.start?new Date(s.start).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
+          const mb=s.type==='manual'||s.manual?'<span class="badge badge-amber" style="margin-left:4px">manual</span>':'';
+          return '<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border)"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;margin-bottom:2px">'+s.project+' <span class="badge '+(CAT_BADGE[s.category]||'badge-gray')+'">'+s.category+'</span>'+mb+'</div><div style="font-size:12px;color:var(--text2)">'+ds+' · '+ts+'</div></div><div style="font-family:var(--mono);font-size:13px;font-weight:500;white-space:nowrap">'+fmtS(s.duration||0)+'</div></div>';
+        }).join('');
+        html += '</div>';
       }
-      viewUid = parseInt(sel.value)||cu.id;
-    }
+      html += '</div>';
+    });
+    el.innerHTML = html || '<div style="text-align:center;padding:32px;color:var(--text3)">No sessions yet.</div>';
+    return;
   }
-  const all=[...sessions.filter(s=>s.uid===viewUid)].reverse();
-  if(!all.length){ el.innerHTML='<div style="text-align:center;padding:32px;color:var(--text3)">No sessions yet.</div>'; return; }
-  el.innerHTML = all.map(s=>{
+  // Regular user: show only own sessions
+  const all=[...sessions.filter(function(s){return s.uid===cu.id;})].reverse();
+  if(!all.length){ el.innerHTML='<div style="text-align:center;padding:32px;color:var(--text3)">No sessions yet. Start tracking to see your activity here.</div>'; return; }
+  el.innerHTML = all.map(function(s){
     const ds=s.start?new Date(s.start).toLocaleDateString([],{month:'short',day:'numeric'}):'';
     const ts=s.start?new Date(s.start).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
-    const thumbs=s.screenshots.map((sc,j)=>`<div class="ss-thumb" onclick="openSS(${s.id},${j})"><img src="${sc.url}" alt="ss"/></div>`).join('');
-    const mb=s.type==='manual'?'<span class="badge badge-amber" style="margin-left:4px">manual</span>':'';
-    return `<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:500;margin-bottom:3px">${s.project} <span class="badge ${CAT_BADGE[s.category]||'badge-gray'}">${s.category}</span>${mb}</div>
-        <div style="font-size:12px;color:var(--text2)">${ds} Â· ${ts}</div>
-        ${thumbs?'<div class="ss-strip">'+thumbs+'</div>':''}
-      </div>
-      <div style="font-family:var(--mono);font-size:13px;font-weight:500;white-space:nowrap">${fmtS(s.duration||0)}</div>
-    </div>`;
+    const thumbs=s.screenshots.map(function(sc,j){return '<div class="ss-thumb" onclick="openSS('+s.id+','+j+')"><img src="'+sc.url+'" alt="ss"/></div>';}).join('');
+    const mb=s.type==='manual'||s.manual?'<span class="badge badge-amber" style="margin-left:4px">manual</span>':'';
+    return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;margin-bottom:3px">'+s.project+' <span class="badge '+(CAT_BADGE[s.category]||'badge-gray')+'">'+s.category+'</span>'+mb+'</div><div style="font-size:12px;color:var(--text2)">'+ds+' · '+ts+'</div>'+(thumbs?'<div class="ss-strip">'+thumbs+'</div>':'')+'</div><div style="font-family:var(--mono);font-size:13px;font-weight:500;white-space:nowrap">'+fmtS(s.duration||0)+'</div></div>';
   }).join('');
 }
-
 function openSS(sid,ji){ const s=sessions.find(x=>x.id===sid); if(!s)return; const sc=s.screenshots[ji]; document.getElementById('ssImg').src=sc.url; document.getElementById('ssMeta').textContent=s.project+' Â· '+new Date(sc.time).toLocaleString(); document.getElementById('ssTitle').textContent='Screenshot â '+s.project; document.getElementById('ssOverlay').classList.add('open'); }
 function closeSS(){ document.getElementById('ssOverlay').classList.remove('open'); }
 
 // ââ INSIGHTS ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderInsights(){
   if(!cu) return;
+  const isAdmin = cu.role==='admin';
+  const insEl = document.getElementById('page-insights');
+  // Remove old admin insights panel if present
+  const oldPanel = document.getElementById('adminInsightsPanel');
+  if(oldPanel) oldPanel.remove();
   const td=todayStr(); const now=new Date(); const wa=new Date(now-7*24*3600*1000);
-  let ts=0,wk=0; const pm={},dm={};
-  sessions.filter(s=>s.uid===cu.id&&s.duration).forEach(s=>{ if(s.date===td) ts+=s.duration; if(new Date(s.start)>=wa) wk+=s.duration; pm[s.project]=(pm[s.project]||0)+s.duration; dm[s.date]=(dm[s.date]||0)+s.duration; });
-  const ad=Object.keys(dm).length||1;
+  if(isAdmin){
+    // Admin: show all users summary table
+    const allUsers = users.filter(function(u){return u.id;});
+    let html = '<div id="adminInsightsPanel" class="card" style="margin-bottom:16px"><div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px">📊 All Team Overview</div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="border-bottom:2px solid var(--border)"><th style="padding:8px 10px;text-align:left;color:var(--text2);font-weight:500">User</th><th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500">Today</th><th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500">This Week</th><th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500">Sessions</th><th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500">Top Project</th></tr></thead><tbody>';
+    allUsers.forEach(function(u){
+      var ts=0,wk=0,cnt=0; var pm={};
+      sessions.filter(function(s){return s.uid===u.id&&s.duration;}).forEach(function(s){
+        if(s.date===td){ts+=s.duration;cnt++;}
+        if(new Date(s.start)>=wa) wk+=s.duration;
+        pm[s.project]=(pm[s.project]||0)+s.duration;
+      });
+      var ps=Object.entries(pm).sort(function(a,b){return b[1]-a[1];});
+      var initial = ((u.name||u.email||'U')[0]).toUpperCase();
+      html += '<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px"><div style="display:flex;align-items:center;gap:8px"><div style="width:30px;height:30px;border-radius:50%;background:#4a86a8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0">'+initial+'</div><div><div style="font-weight:500;color:var(--text)">'+(u.name||u.email)+'</div><div style="font-size:11px;color:var(--text2)">'+(u.dept||u.role||'')+'</div></div></div></td>';
+      html += '<td style="padding:8px 10px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--text)">'+fmtHM(ts)+'</td>';
+      html += '<td style="padding:8px 10px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--text)">'+fmtHM(wk)+'</td>';
+      html += '<td style="padding:8px 10px;text-align:right;color:var(--text)">'+cnt+'</td>';
+      html += '<td style="padding:8px 10px;text-align:right;color:var(--text2);font-size:12px">'+(ps[0]?ps[0][0]:'—')+'</td></tr>';
+    });
+    html += '</tbody></table></div></div>';
+    var pageHeader = insEl ? insEl.querySelector('.page-header') : null;
+    if(pageHeader) pageHeader.insertAdjacentHTML('afterend', html);
+    var metricGrid = insEl ? insEl.querySelector('.metric-grid') : null;
+    if(metricGrid) metricGrid.style.display='none';
+    var allCards = insEl ? insEl.querySelectorAll('.card') : [];
+    allCards.forEach(function(c){if(!c.id||c.id!=='adminInsightsPanel') c.style.display='none';});
+    return;
+  }
+  // Regular user: show personal insights
+  var metricGrid2 = insEl ? insEl.querySelector('.metric-grid') : null;
+  if(metricGrid2) metricGrid2.style.display='';
+  var allCards2 = insEl ? insEl.querySelectorAll('.card') : [];
+  allCards2.forEach(function(c){c.style.display='';});
+  var ts=0,wk=0; var pm={},dm={};
+  sessions.filter(function(s){return s.uid===cu.id&&s.duration;}).forEach(function(s){ if(s.date===td) ts+=s.duration; if(new Date(s.start)>=wa) wk+=s.duration; pm[s.project]=(pm[s.project]||0)+s.duration; dm[s.date]=(dm[s.date]||0)+s.duration; });
+  var ad=Object.keys(dm).length||1;
   document.getElementById('i-today').textContent=fmtHM(ts);
   document.getElementById('i-week').textContent=fmtHM(wk);
   document.getElementById('i-avg').textContent=fmtHM(Math.round(wk/Math.min(ad,7)));
-  const ps=Object.entries(pm).sort((a,b)=>b[1]-a[1]);
-  document.getElementById('i-top').textContent=ps[0]?ps[0][0]:'â';
-  const tot=ps.reduce((a,b)=>a+b[1],0)||1;
-  document.getElementById('projBars').innerHTML=ps.length?ps.map(([n,s],i)=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="font-size:12px;width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)">${n}</div><div style="flex:1"><div class="prog-wrap"><div class="prog-fill" style="width:${Math.round(s/tot*100)}%;background:${CHART_COLORS[i%CHART_COLORS.length]}"></div></div></div><div style="font-size:11px;color:var(--text2);width:50px;text-align:right;font-family:var(--mono)">${fmtHM(s)}</div></div>`).join(''):'<div style="color:var(--text3);font-size:13px;text-align:center;padding:12px">No data yet.</div>';
+  var ps=Object.entries(pm).sort(function(a,b){return b[1]-a[1];});
+  document.getElementById('i-top').textContent=ps[0]?ps[0][0]:'—';
+  var tot=ps.reduce(function(a,b){return a+b[1];},0)||1;
+  document.getElementById('projBars').innerHTML=ps.length?ps.map(function(entry,i){ var n=entry[0],s=entry[1]; return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="font-size:12px;width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)">'+n+'</div><div style="flex:1"><div class="prog-wrap"><div class="prog-fill" style="width:'+Math.round(s/tot*100)+'%;background:'+CHART_COLORS[i%CHART_COLORS.length]+'"></div></div></div><div style="font-size:11px;color:var(--text2);width:50px;text-align:right;font-family:var(--mono)">'+fmtHM(s)+'</div></div>'; }).join(''):'<div style="color:var(--text3);font-size:13px;text-align:center;padding:12px">No data yet.</div>';
   if(pieO){pieO.destroy();pieO=null;}
-  if(ps.length) pieO=new Chart(document.getElementById('pieChart'),{type:'doughnut',data:{labels:ps.map(p=>p[0]),datasets:[{data:ps.map(p=>Math.round(p[1]/60)),backgroundColor:ps.map((_,i)=>CHART_COLORS[i%CHART_COLORS.length]),borderWidth:1,borderColor:'rgba(255,255,255,.3)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.label+': '+fmtHM(ps[ctx.dataIndex][1])}}}}});
-  const last7=[]; for(let i=6;i>=0;i--){ const d=new Date(now-i*24*3600*1000); const k=d.toISOString().slice(0,10); last7.push({label:d.toLocaleDateString([],{weekday:'short'}),sec:dm[k]||0,isT:k===td}); }
+  if(ps.length) pieO=new Chart(document.getElementById('pieChart'),{type:'doughnut',data:{labels:ps.map(function(p){return p[0];}),datasets:[{data:ps.map(function(p){return Math.round(p[1]/60);}),backgroundColor:ps.map(function(_,i){return CHART_COLORS[i%CHART_COLORS.length];}),borderWidth:1,borderColor:'rgba(255,255,255,.3)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.label+': '+fmtHM(ps[ctx.dataIndex][1]);}}}}}});
+  var last7=[]; for(var i=6;i>=0;i--){ var d=new Date(now-i*24*3600*1000); var k=d.toISOString().slice(0,10); last7.push({label:d.toLocaleDateString([],{weekday:'short'}),sec:dm[k]||0,isT:k===td}); }
   if(barO){barO.destroy();barO=null;}
-  barO=new Chart(document.getElementById('barChart'),{type:'bar',data:{labels:last7.map(d=>d.label),datasets:[{label:'Hours',data:last7.map(d=>parseFloat((d.sec/3600).toFixed(2))),backgroundColor:last7.map(d=>d.isT?'#4a86a8':'#9FE1CB'),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'h'},grid:{color:'rgba(128,128,128,0.08)'}},x:{grid:{display:false}}}}});
+  barO=new Chart(document.getElementById('barChart'),{type:'bar',data:{labels:last7.map(function(d){return d.label;}),datasets:[{label:'Hours',data:last7.map(function(d){return parseFloat((d.sec/3600).toFixed(2));}),backgroundColor:last7.map(function(d){return d.isT?'#4a86a8':'#9FE1CB';}),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{callback:function(v){return v+'h';}}},x:{grid:{display:false}}}}});
 }
 
-// ââ REPORTS âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function populateRptUsers(){
   const el=document.getElementById('rptUser'); const cv=el.value;
   const emps=cu.role==='admin'?users.filter(u=>u.role!=='admin'):cu.role==='manager'?users.filter(u=>u.role==='employee'):[cu];
@@ -1271,6 +1343,7 @@ function processApproval(aid,status){
   if(status==='approved' && a.type==='Time Adjustment' && a.startTs && a.endTs){
     const newSess={id:nsid++,uid:a.uid,start:a.startTs,end:a.endTs,duration:Math.round((a.endTs-a.startTs)/1000),date:new Date(a.startTs).toISOString().slice(0,10),project:a.note||'Manual entry',category:'Work',screenshots:[],manual:true};
     sessions.push(newSess);
+    saveSessions();
     const _mu=users.find(x=>x.id===a.uid);
     showToast('\u2713 Time added to '+(_mu?_mu.name:'user')+"'s timeline",'success');
   }
@@ -1897,23 +1970,43 @@ function completeLogin(user) {
     try { if (typeof showInner === 'function') showInner('tracker'); } catch(e2) {}
   }
   
+  // Load persisted sessions for current user
+  try { loadSessions(); } catch(e) {}
   // Start idle tracking
   try { startIdleTracking(); } catch(e) {}
 }
 
-// Idle tracking - 20 minutes
+// Idle tracking - 20 minutes (fires only after true inactivity)
+var _idleStarted = false;
 function startIdleTracking() {
-  var events = ['mousemove','mousedown','keydown','touchstart','scroll','click'];
+  // Prevent duplicate event listeners
+  if (_idleStarted) {
+    clearTimeout(_idleTimeout);
+    _idleTimeout = setTimeout(showIdleWarning, _idleMinutes * 60 * 1000);
+    return;
+  }
+  _idleStarted = true;
   function resetTimer() {
+    // Don't reset if warning is already showing
+    var overlay = document.getElementById('idleWarningOverlay');
+    if (overlay && overlay.style.display === 'flex') return;
     clearTimeout(_idleTimeout);
     _idleTimeout = setTimeout(showIdleWarning, _idleMinutes * 60 * 1000);
   }
-  events.forEach(function(evt) { document.addEventListener(evt, resetTimer, true); });
+  var events = ['mousemove','mousedown','keydown','touchstart','scroll','click','pointermove'];
+  events.forEach(function(evt) { document.addEventListener(evt, resetTimer, {passive:true,capture:true}); });
+  // Reset when tab becomes visible again (user switches back)
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') resetTimer();
+  });
+  window.addEventListener('focus', resetTimer);
   resetTimer();
   window._resetIdleTimer = resetTimer;
 }
 
 function showIdleWarning() {
+  // Only show if user is logged in
+  if (!cu) return;
   var overlay = document.getElementById('idleWarningOverlay');
   if (overlay) overlay.style.display = 'flex';
   var countdown = 60;
@@ -1937,6 +2030,7 @@ function resetIdle() {
 }
 
 function stopIdleTracking() {
+  _idleStarted = false;
   clearTimeout(_idleTimeout);
   clearInterval(_idleCountdownInterval);
 }
