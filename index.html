@@ -734,6 +734,15 @@ async function amcRemoveUserFromCode(uid) {
 }
 
 
+let nuid=6,nsid=1,nlid=1,nhid=14,napid=3,naudid=2;
+let cu=null, tInt=null, ssInt=null, secs=0, running=false, stream=null, screenOk=false, curSess=null;
+let pieO=null, barO=null, rptBarO=null;
+let mmode='', medit=null, webhookUrl='', activeAlerts=[];
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const pad = n => String(n).padStart(2,'0');
+const fmtS = s => { const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60; return `${pad(h)}:${pad(m)}:${pad(sc)}`; };
+const fmtHM = s => `${Math.floor(s/3600)}h ${Math.floor((s%3600)/60)}m`;
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 const ini = n => n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 const avStyle = i => { const c=AV_COLORS[i%AV_COLORS.length]; return `background:${c[0]};color:${c[1]}`; };
