@@ -370,13 +370,24 @@ tr:hover td{background:var(--surface2)}
 <!-- ACTIVITY PAGE -->
 <div class="page" id="page-activity">
   <div class="page-header"><div class="page-title">Activity log</div><div class="page-sub">All your tracked sessions</div></div>
-  <div class="card" id="activityList"><div style="text-align:center;padding:32px;color:var(--text3)">No sessions yet. Start tracking to see your activity here.</div></div>
+
+  <div id="adminViewBar" style="margin-bottom:12px;display:none;align-items:center;gap:10px">
+    <label style="font-size:13px;font-weight:500;white-space:nowrap">Viewing:</label>
+    <select id="adminViewUser" onchange="renderActivity()" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;max-width:260px"></select>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+    <button class="btn btn-outline" id="logTimeBtnAct" onclick="openManualTimeModal()" style="font-size:13px;padding:6px 14px">+ Log time manually</button>
+  </div>  <div class="card" id="activityList"><div style="text-align:center;padding:32px;color:var(--text3)">No sessions yet. Start tracking to see your activity here.</div></div>
 </div>
 
 <!-- INSIGHTS PAGE -->
 <div class="page" id="page-insights">
   <div class="page-header"><div class="page-title">Insights</div><div class="page-sub">Your productivity overview</div></div>
-  <div class="metric-grid">
+
+  <div id="adminViewBar_insights" style="margin-bottom:12px;display:none;align-items:center;gap:10px">
+    <label style="font-size:13px;font-weight:500;white-space:nowrap">Viewing:</label>
+    <select id="adminViewUser_insights" onchange="renderInsights()" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;max-width:260px"></select>
+  </div>  <div class="metric-grid">
     <div class="metric"><div class="metric-label">Today</div><div class="metric-value" id="i-today">0h 0m</div></div>
     <div class="metric"><div class="metric-label">This week</div><div class="metric-value" id="i-week">0h 0m</div></div>
     <div class="metric"><div class="metric-label">Daily avg</div><div class="metric-value" id="i-avg">0h 0m</div></div>
@@ -396,7 +407,11 @@ tr:hover td{background:var(--surface2)}
 <!-- REPORTS PAGE -->
 <div class="page" id="page-reports">
   <div class="page-header"><div class="page-title">Reports</div><div class="page-sub">Attendance, hours, and productivity analytics</div></div>
-  <div class="card">
+
+  <div id="adminViewBar_reports" style="margin-bottom:12px;display:none;align-items:center;gap:10px">
+    <label style="font-size:13px;font-weight:500;white-space:nowrap">Viewing:</label>
+    <select id="adminViewUser_reports" onchange="renderReports()" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;max-width:260px"></select>
+  </div>  <div class="card">
     <div class="card-title">Report period</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
       <div style="min-width:140px"><label style="font-size:11px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px">Quick range</label>
@@ -436,7 +451,11 @@ tr:hover td{background:var(--surface2)}
   <div class="page-header">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div><div class="page-title">Leave management</div><div class="page-sub">Track leave balances and requests</div></div>
-      <button class="btn btn-success" onclick="openModal('addLeave')">+ Log leave</button>
+
+  <div id="adminViewBar_leaves" style="margin-bottom:12px;display:none;align-items:center;gap:10px">
+    <label style="font-size:13px;font-weight:500;white-space:nowrap">Viewing:</label>
+    <select id="adminViewUser_leaves" onchange="renderLeaves()" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;max-width:260px"></select>
+  </div>      <button class="btn btn-success" onclick="openModal('addLeave')">+ Log leave</button>
     </div>
   </div>
   <div class="card"><div class="card-title">Leave balances</div><div id="leaveBalances"></div></div>
@@ -580,7 +599,11 @@ tr:hover td{background:var(--surface2)}
 <!-- AUDIT LOG PAGE -->
 <div class="page" id="page-audit">
   <div class="page-header"><div class="page-title">Audit log</div><div class="page-sub">Every action recorded with timestamp and user</div></div>
-  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+
+  <div id="adminViewBar_audit" style="margin-bottom:12px;display:none;align-items:center;gap:10px">
+    <label style="font-size:13px;font-weight:500;white-space:nowrap">Viewing:</label>
+    <select id="adminViewUser_audit" onchange="renderAudit()" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;max-width:260px"></select>
+  </div>  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
     <select id="audCat" style="font-size:12px;padding:5px 24px 5px 9px" onchange="renderAudit()"><option value="">All categories</option><option>User</option><option>Leave</option><option>Session</option><option>System</option><option>Approval</option></select>
     <select id="audUser" style="font-size:12px;padding:5px 24px 5px 9px" onchange="renderAudit()"><option value="">All users</option></select>
   </div>
@@ -598,6 +621,38 @@ tr:hover td{background:var(--surface2)}
   <div class="modal-footer">
     <button class="btn" onclick="closeModal()">Cancel</button>
     <button class="btn btn-primary" id="modalConfirm" onclick="doModal()">Confirm</button>
+  </div>
+</div>
+</div>
+
+<!-- MANUAL TIME ENTRY MODAL -->
+<div class="modal-overlay" id="manualTimeOverlay" onclick="if(event.target===this)closeManualTimeModal()" style="display:none">
+<div class="modal" style="max-width:420px">
+  <div class="modal-header"><h3>Log Time Manually</h3><button class="icon-btn" onclick="closeManualTimeModal()">&#x2715;</button></div>
+  <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+    <div>
+      <label style="font-size:13px;font-weight:500;display:block;margin-bottom:4px">Date</label>
+      <input type="date" id="mt_date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <label style="font-size:13px;font-weight:500;display:block;margin-bottom:4px">Start time</label>
+        <input type="time" id="mt_start" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px">
+      </div>
+      <div>
+        <label style="font-size:13px;font-weight:500;display:block;margin-bottom:4px">End time</label>
+        <input type="time" id="mt_end" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px">
+      </div>
+    </div>
+    <div>
+      <label style="font-size:13px;font-weight:500;display:block;margin-bottom:4px">Project / note (optional)</label>
+      <input type="text" id="mt_note" placeholder="e.g. Client meeting, deep work..." style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px">
+    </div>
+    <p style="font-size:12px;color:var(--text3);margin:0">Your request will be reviewed by admin before being added to your timeline.</p>
+  </div>
+  <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:10px">
+    <button class="btn btn-outline" onclick="closeManualTimeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="submitManualTime()">Submit for approval</button>
   </div>
 </div>
 </div>
@@ -659,11 +714,16 @@ const PERM_LABELS = {view_all:'View all user data',edit_users:'Edit user profile
 
 let users = [
   {id:1,name:'Admin User',email:'amir@amedcompliance.com',role:'admin',pin:'0000',color:0,dept:2,shift:1,invited:true,status:'active',phone:'555-0100',jobTitle:'CISO and Director of HR',startDate:'2020-01-15',leaveBalance:{vacation:6,sick:4,personal:2, password: "Admin@123!", needsSetup: false},manager:null, password: "Admin@123!", needsSetup: false},
-  {id:2,name:'Dr. Alice Johnson',email:'alice.johnson@amedcompliance.com',role:'manager',pin:'1234',color:1,dept:1,shift:1,invited:true,status:'active',phone:'555-0101',jobTitle:'Director of Global Operations',startDate:'2021-03-01',leaveBalance:{vacation:6,sick:4,personal:2},manager:1, password: "", needsSetup: true},
-  {id:3,name:'Bob Martinez',email:'bob.martinez@amedcompliance.com',role:'employee',pin:'1234',color:2,dept:3,shift:1,invited:false,status:'active',phone:'555-0102',jobTitle:'Senior e-Learning Developer',startDate:'2022-06-10',leaveBalance:{vacation:6,sick:4,personal:2},manager:1, password: "", needsSetup: true},
-  {id:4,name:'Sara Chen',email:'sara.chen@amedcompliance.com',role:'employee',pin:'1234',color:3,dept:4,shift:2,invited:true,status:'active',phone:'555-0103',jobTitle:'Creative Content Executive',startDate:'2021-11-20',leaveBalance:{vacation:6,sick:4,personal:2},manager:1, password: "", needsSetup: true},
 {id:5,name:'Czarina Magana',email:'czarina.magana@amedcompliance.com',role:'employee',pin:'1234',color:4,dept:1,shift:1,invited:true,status:'active',phone:'',jobTitle:'',startDate:'2026-05-13',leaveBalance:{vacation:6,sick:4,personal:2},manager:1, password: "", needsSetup: true},
 ];
+
+// ── STARTUP: Apply deleted user blacklist + load extra users ──
+(function(){
+  const _deleted = JSON.parse(localStorage.getItem('amc_deleted_users')||'[]');
+  if(_deleted.length) users = users.filter(function(u){return !_deleted.includes(u.id);});
+  const _extra = JSON.parse(localStorage.getItem('amc_users_extra')||'[]');
+  _extra.forEach(function(u){ if(!users.find(function(x){return x.id===u.id;})) users.push(u); });
+})();
 // ── ADD USER TO SOURCE CODE via GitHub API ──────────────────
 // When admin adds a user, this patches index.html directly in GitHub
 // so the user is hardcoded and works on ALL devices after ~30s deploy
@@ -890,7 +950,24 @@ const CAT_BADGE = {Work:'badge-teal',Design:'badge-blue',Dev:'badge-blue',Meetin
 
 function renderActivity(){
   const el=document.getElementById('activityList'); if(!cu) return;
-  const all=[...sessions.filter(s=>s.uid===cu.id)].reverse();
+  // Admin: show/populate user selector
+  const isAdmin = cu.role==='admin';
+  const adminBar = document.getElementById('adminViewBar');
+  const logBtn = document.getElementById('logTimeBtnAct');
+  if(adminBar){ adminBar.style.display = isAdmin ? 'flex' : 'none'; }
+  if(logBtn){ logBtn.style.display = isAdmin ? 'none' : ''; }
+  let viewUid = cu.id;
+  if(isAdmin){
+    const sel = document.getElementById('adminViewUser');
+    if(sel){
+      if(!sel.options.length || sel.dataset.populated!=='1'){
+        sel.innerHTML = users.map(u=>'<option value="'+u.id+'">'+(u.name)+' ('+u.role+')</option>').join('');
+        sel.dataset.populated='1';
+      }
+      viewUid = parseInt(sel.value)||cu.id;
+    }
+  }
+  const all=[...sessions.filter(s=>s.uid===viewUid)].reverse();
   if(!all.length){ el.innerHTML='<div style="text-align:center;padding:32px;color:var(--text3)">No sessions yet.</div>'; return; }
   el.innerHTML = all.map(s=>{
     const ds=s.start?new Date(s.start).toLocaleDateString([],{month:'short',day:'numeric'}):'';
@@ -1124,7 +1201,7 @@ function sendInvite(uid){
   u.invited=true; addAudit(cu.id,'Invite sent','User',`Invite sent to ${u.email}`); renderUsers();
 }
 
-function removeUser(uid){ if(!confirm('Remove this user and all their data?'))return; const u=users.find(x=>x.id===uid); addAudit(cu.id,'User deleted','User',`Removed ${u?.name}`); users=users.filter(x=>x.id!==uid);localStorage.setItem('amc_users_extra',JSON.stringify(users.filter(function(u){return u.id>5;})));amcRemoveUserFromCode(uid);  sessions=sessions.filter(s=>s.uid!==uid); leaves=leaves.filter(l=>l.uid!==uid); renderUsers(); buildDeptFilter(); }
+function removeUser(uid){ if(!confirm('Remove this user and all their data?'))return; const u=users.find(x=>x.id===uid); addAudit(cu.id,'User deleted','User',`Removed ${u?.name}`); users=users.filter(x=>x.id!==uid);localStorage.setItem('amc_users_extra',JSON.stringify(users.filter(function(u){return u.id>5;})));const _del2=JSON.parse(localStorage.getItem('amc_deleted_users')||'[]');if(!_del2.includes(uid)){_del2.push(uid);localStorage.setItem('amc_deleted_users',JSON.stringify(_del2));}amcRemoveUserFromCode(uid);  sessions=sessions.filter(s=>s.uid!==uid); leaves=leaves.filter(l=>l.uid!==uid); renderUsers(); buildDeptFilter(); }
 
 // ââ ADMIN â DEPTS âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderDepts(){
@@ -1189,6 +1266,13 @@ function processApproval(aid,status){
   a.status=status; a.approver=cu.id;
   const u=users.find(x=>x.id===a.uid);
   addAudit(cu.id,`Approval ${status}`,'Approval',`${a.type} for ${u?u.name:'?'} â ${status}`);
+  // If approved time adjustment -> add as session
+  if(status==='approved' && a.type==='Time Adjustment' && a.startTs && a.endTs){
+    const newSess={id:nsid++,uid:a.uid,start:a.startTs,end:a.endTs,duration:Math.round((a.endTs-a.startTs)/1000),date:new Date(a.startTs).toISOString().slice(0,10),project:a.note||'Manual entry',category:'Work',screenshots:[],manual:true};
+    sessions.push(newSess);
+    const _mu=users.find(x=>x.id===a.uid);
+    showToast('\u2713 Time added to '+(_mu?_mu.name:'user')+"'s timeline",'success');
+  }
   renderApprovals();
 }
 
@@ -1310,7 +1394,7 @@ async function testWH(){ if(!webhookUrl){alert('Save URL first.');return;} const
 async function pushAlerts(){ if(!webhookUrl){alert('Save webhook URL first.');return;} if(!activeAlerts.length){document.getElementById('pushSt').textContent='No alerts to push.';return;} document.getElementById('pushSt').textContent='Sending...'; try{ await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source:'AMC Time Tracker',timestamp:new Date().toISOString(),alert_count:activeAlerts.length,alerts:activeAlerts.map(a=>({user:a.name,type:a.type,severity:a.sev,message:a.msg,ts:new Date().toISOString()}))})}); document.getElementById('pushSt').textContent=activeAlerts.length+' alerts pushed'; addAudit(cu.id,'Alerts pushed','System',activeAlerts.length+' HR alerts sent to n8n'); }catch(e){ document.getElementById('pushSt').textContent='Push failed â check URL'; } }
 
 // ââ AUDIT âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-function buildAuditFilters(){ const el=document.getElementById('audUser'); const cv=el.value; el.innerHTML='<option value="">All users</option>'+users.map(u=>`<option value="${u.id}"${cv==u.id?' selected':''}>${u.name}</option>`).join(''); }
+function buildAuditFilters(){ const el=document.getElementById('audUser'); if(!cu) return; if(cu.role!=='admin'){el.value=cu.id;el.closest&&el.closest('div')&&(el.closest('div').style.display='none');return;} el.closest&&el.closest('div')&&(el.closest('div').style.display=''); const cv=el.value; el.innerHTML='<option value="">All users</option>'+users.map(u=>`<option value="${u.id}"${cv==u.id?' selected':''}>${u.name}</option>`).join(''); }
 function renderAudit(){
   const cf=document.getElementById('audCat').value; const uf=document.getElementById('audUser').value;
   const filtered=auditLog.filter(a=>(!cf||a.category===cf)&&(!uf||a.uid==uf));
@@ -2012,7 +2096,73 @@ window.doLogout = doLogout;
 window.toggleMS365 = toggleMS365;
 window.connectMS365 = connectMS365;
 window.checkMS365AuthReturn = checkMS365AuthReturn;
-setTimeout(function(){ if(typeof checkMS365AuthReturn==='function') checkMS365AuthReturn(); }, 600);</script>
+setTimeout(function(){ if(typeof checkMS365AuthReturn==='function') checkMS365AuthReturn(); }, 600);
+
+// ── ADMIN VIEW HELPER: get uid being viewed ──
+function getViewUid(pageKey){
+  if(!cu) return 0;
+  if(cu.role!=='admin') return cu.id;
+  const sel = document.getElementById('adminViewUser_'+pageKey);
+  if(!sel) return cu.id;
+  if(!sel.options.length){
+    sel.innerHTML = users.map(function(u){return '<option value="'+u.id+'">'+u.name+' ('+u.role+')</option>';}).join('');
+  }
+  return parseInt(sel.value)||cu.id;
+}
+function showAdminViewBar(pageKey, renderFn){
+  const bar = document.getElementById('adminViewBar_'+pageKey);
+  if(!bar) return;
+  if(cu && cu.role==='admin'){
+    bar.style.display='flex';
+    const sel = document.getElementById('adminViewUser_'+pageKey);
+    if(sel && !sel.options.length){
+      sel.innerHTML = users.map(function(u){return '<option value="'+u.id+'">'+u.name+'</option>';}).join('');
+      sel.onchange = function(){ if(typeof renderFn==='function') renderFn(); else eval(renderFn+'()'); };
+    }
+  } else {
+    bar.style.display='none';
+  }
+}
+
+// ── MANUAL TIME ENTRY ──
+function openManualTimeModal(){
+  const ov = document.getElementById('manualTimeOverlay');
+  if(!ov) return;
+  // Set default date to today
+  const today = new Date().toISOString().slice(0,10);
+  const di = document.getElementById('mt_date');
+  const si = document.getElementById('mt_start');
+  const ei = document.getElementById('mt_end');
+  const ni = document.getElementById('mt_note');
+  if(di) di.value = today;
+  if(si) si.value = '09:00';
+  if(ei) ei.value = '17:00';
+  if(ni) ni.value = '';
+  ov.style.display='flex';
+}
+function closeManualTimeModal(){
+  const ov = document.getElementById('manualTimeOverlay');
+  if(ov) ov.style.display='none';
+}
+function submitManualTime(){
+  if(!cu) return;
+  const dateVal = document.getElementById('mt_date').value;
+  const startVal = document.getElementById('mt_start').value;
+  const endVal = document.getElementById('mt_end').value;
+  const noteVal = (document.getElementById('mt_note').value||'').trim();
+  if(!dateVal||!startVal||!endVal){alert('Please fill in date, start time, and end time.');return;}
+  const startTs = new Date(dateVal+'T'+startVal+':00').getTime();
+  const endTs = new Date(dateVal+'T'+endVal+':00').getTime();
+  if(endTs<=startTs){alert('End time must be after start time.');return;}
+  const dur = Math.round((endTs-startTs)/1000/60);
+  const appr={id:napid++,uid:cu.id,type:'Time Adjustment',detail:dateVal+' '+startVal+'–'+endVal+(noteVal?' — '+noteVal:''),startTs:startTs,endTs:endTs,note:noteVal,duration:dur,status:'pending',submitted:todayStr()};
+  approvals.push(appr);
+  addAudit(cu.id,'Manual time submitted','Time',appr.detail);
+  closeManualTimeModal();
+  showToast('\u2713 Time request submitted for admin approval','success');
+}
+
+</script>
 
 <div id="idleWarningOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:white;border-radius:16px;padding:40px;text-align:center;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,0.3);">
