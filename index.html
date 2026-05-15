@@ -2263,7 +2263,7 @@ function startOTPTimer() {
 }
 
 // Email login flow
-function doEmailLogin() {
+async function doEmailLogin() {
   var email = (document.getElementById('loginEmail') || {}).value || '';
   var password = (document.getElementById('loginPassword') || {}).value || '';
   var errEl = document.getElementById('loginError');
@@ -2643,6 +2643,8 @@ window.addEventListener('DOMContentLoaded', function() {
 
 // Expose auth functions to window scope for onclick handlers
 window.doEmailLogin = doEmailLogin;
+  window.fetchUsersFromGitHub = fetchUsersFromGitHub;
+  window.syncUsersToGitHub = syncUsersToGitHub;
 window.verifyOtp = verifyOtp;
 window.resendOtp = resendOtp;
 window.completeSetup = completeSetup;
