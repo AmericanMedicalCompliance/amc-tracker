@@ -849,48 +849,68 @@ let users = [
     });
   } catch(e) {}
 })();
+// Fetch users from GitHub on startup
+fetchUsersFromGitHub();
 // Ã¢ÂÂÃ¢ÂÂ ADD USER TO SOURCE CODE via GitHub API Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // When admin adds a user, this patches index.html directly in GitHub
 // so the user is hardcoded and works on ALL devices after ~30s deploy
-async function amcAddUserToCode(newUser) {
+async function syncUsersToGitHub() {
   const pat = localStorage.getItem('amc_github_pat');
-  if (!pat) return;
+  if (!pat) return; // No PAT - skip GitHub sync (users saved locally)
   try {
-    const owner = 'amedcompliance', repo = 'amc-tracker', file = 'index.html';
-    const fileResp = await fetch('https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + file, {
-      headers: {'Authorization':'token ' + pat,'Accept':'application/vnd.github.v3+json'}
+    const owner = 'amedcompliance', repo = 'amc-tracker', file = 'users.json';
+    // Get current file SHA
+    const fileResp = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${file}`, {
+      headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github.v3+json' }
     });
     const fileData = await fileResp.json();
-    const currentHTML = decodeURIComponent(escape(atob(fileData.content.split('\n').join(''))));
     const currentSha = fileData.sha;
-    const insertMarker = '\n];\n// \u2500\u2500 ADD USER TO SOURCE CODE';
-    const insertPos = currentHTML.indexOf(insertMarker);
-    if (insertPos === -1) { console.warn('AMC: Could not find insert marker'); return; }
-    const u = newUser;
-    const today = new Date().toISOString().slice(0,10);
-    const newEntry = '\n{id:' + u.id + ',name:\'' + u.name.replace(/'/g,"\\'") + '\',email:\'' + u.email + '\',role:\'' + u.role + '\',pin:\'' + (u.pin||'1234') + '\',color:' + ((u.id-1)%8) + ',dept:' + (u.dept||1) + ',shift:' + (u.shift||1) + ',invited:true,status:\'active\',phone:\'\',jobTitle:\'\',startDate:\'' + today + '\',leaveBalance:{vacation:6,sick:4,personal:2},manager:1, password: "", needsSetup: true},';
-    const newHTML2 = currentHTML.substring(0, insertPos) + newEntry + currentHTML.substring(insertPos);
-    const nuOld = 'let nuid=' + (u.id) + ',';
-    const nuNew = 'let nuid=' + (u.id + 1) + ',';
-    const finalHTML2 = newHTML2.replace(nuOld, nuNew);
-    const body = JSON.stringify({
-      message: 'Add user: ' + u.name,
-      content: btoa(unescape(encodeURIComponent(finalHTML2))),
-      sha: currentSha
-    });
-    const putResp = await fetch('https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + file, {
+    // Build users list - only non-admin users, no passwords
+    const usersToSave = users.filter(u => u.role !== 'admin' && u.id !== 1).map(u => ({
+      id: u.id, name: u.name, email: u.email, role: u.role, dept: u.dept,
+      shift: u.shift, jobTitle: u.jobTitle, phone: u.phone, status: u.status,
+      startDate: u.startDate, invited: u.invited, manager: u.manager,
+      leaveBalance: u.leaveBalance, needsSetup: u.needsSetup,
+      color: u.color, pin: u.pin
+    }));
+    const content = { users: usersToSave, updated: new Date().toISOString(),
+      note: 'AMC Time Tracker user database. Managed automatically by the app.' };
+    const newContent = JSON.stringify(content, null, 2);
+    await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${file}`, {
       method: 'PUT',
-      headers: {'Authorization':'token ' + pat,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
-      body: body
+      headers: { Authorization: 'token ' + pat, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'Sync users', content: btoa(unescape(encodeURIComponent(newContent))), sha: currentSha })
     });
-    if (putResp.ok) {
-      showToast('\u2713 User added - will be available on all devices in ~30 seconds', 'success');
-    } else {
-      const err = await putResp.json();
-      console.warn('AMC GitHub patch failed:', err.message);
-    }
-  } catch(e) { console.warn('AMC add user to code error:', e); }
+    console.log('AMC: Users synced to GitHub');
+  } catch(e) { console.warn('AMC: Could not sync users to GitHub:', e.message); }
 }
+
+async function fetchUsersFromGitHub() {
+  try {
+    const url = 'https://raw.githubusercontent.com/amedcompliance/amc-tracker/main/users.json?t=' + Date.now();
+    const r = await fetch(url);
+    if (!r.ok) return;
+    const data = await r.json();
+    if (!data.users || !Array.isArray(data.users)) return;
+    const deleted = JSON.parse(localStorage.getItem('amc_deleted_users') || '[]');
+    let added = 0;
+    data.users.forEach(u => {
+      if (deleted.includes(u.id)) return; // skip deleted
+      if (users.find(x => x.id === u.id || x.email === u.email)) return; // already exists
+      // Apply saved password if any
+      const savedPwds = JSON.parse(localStorage.getItem('amc_user_passwords') || '{}');
+      if (savedPwds[u.id]) { u.password = savedPwds[u.id].password; u.needsSetup = savedPwds[u.id].needsSetup; }
+      users.push(u);
+      added++;
+    });
+    if (added > 0) console.log('AMC: Loaded ' + added + ' users from GitHub');
+    // Update nuid to be above all loaded user ids
+    const maxId = Math.max(...users.map(u => u.id), 5);
+    if (nuid <= maxId) nuid = maxId + 1;
+  } catch(e) { console.warn('AMC: Could not fetch users from GitHub:', e.message); }
+}
+
+
 
 async function amcRemoveUserFromCode(uid) {
   const pat = localStorage.getItem('amc_github_pat');
@@ -1720,7 +1740,7 @@ function sendInvite(uid){
   u.invited=true; addAudit(cu.id,'Invite sent','User',`Invite sent to ${u.email}`); renderUsers();
 }
 
-function removeUser(uid){ if(!confirm('Remove this user and all their data?'))return; const u=users.find(x=>x.id===uid); addAudit(cu.id,'User deleted','User',`Removed ${u?.name}`); users=users.filter(x=>x.id!==uid);localStorage.setItem('amc_users_extra',JSON.stringify(users.filter(function(u){return u.id>5;})));const _del2=JSON.parse(localStorage.getItem('amc_deleted_users')||'[]');if(!_del2.includes(uid)){_del2.push(uid);localStorage.setItem('amc_deleted_users',JSON.stringify(_del2));}amcRemoveUserFromCode(uid);  sessions=sessions.filter(s=>s.uid!==uid); leaves=leaves.filter(l=>l.uid!==uid); renderUsers(); buildDeptFilter(); }
+function removeUser(uid){ if(!confirm('Remove this user and all their data?'))return; const u=users.find(x=>x.id===uid); addAudit(cu.id,'User deleted','User',`Removed ${u?.name}`); users=users.filter(x=>x.id!==uid);localStorage.setItem('amc_users_extra',JSON.stringify(users.filter(function(u){return u.id>5;})));const _del2=JSON.parse(localStorage.getItem('amc_deleted_users')||'[]');if(!_del2.includes(uid)){_del2.push(uid);localStorage.setItem('amc_deleted_users',JSON.stringify(_del2));}syncUsersToGitHub();  sessions=sessions.filter(s=>s.uid!==uid); leaves=leaves.filter(l=>l.uid!==uid); renderUsers(); buildDeptFilter(); }
 
 // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ ADMIN ÃÂ¢ÃÂÃÂ DEPTS ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 function renderDepts(){
@@ -2052,7 +2072,7 @@ function doModal(){
     const role=document.getElementById('f-r').value; const pin=document.getElementById('f-p').value;
     if(!name||!pin){alert('Name and PIN required.');return;}
     const nu={id:nuid++,name,email,role,pin,color:users.length%6,dept:+document.getElementById('f-d').value,shift:+document.getElementById('f-sh').value,manager:+document.getElementById('f-mgr').value||null,customStart:document.getElementById('f-cs').value||null,customEnd:document.getElementById('f-ce').value||null,invited:false,status:document.getElementById('f-st').value,jobTitle:document.getElementById('f-jt').value,startDate:document.getElementById('f-sd').value,leaveBalance:{vacation:+document.getElementById('f-lv').value,sick:+document.getElementById('f-ls').value,personal:+document.getElementById('f-lp').value},password:'',needsSetup:true};
-    users.push(nu);localStorage.setItem('amc_users_extra',JSON.stringify(users.filter(function(u){return u.id>5;})));amcAddUserToCode(cu);  addAudit(cu.id,'User added','User',`Added ${name} (${role})`); closeModal(); renderUsers(); buildDeptFilter();
+    users.push(nu);localStorage.setItem('amc_users_extra',JSON.stringify(users.filter(function(u){return u.id>5;})));syncUsersToGitHub();  addAudit(cu.id,'User added','User',`Added ${name} (${role})`); closeModal(); renderUsers(); buildDeptFilter();
     if(document.getElementById('f-inv')?.checked) sendInvite(nu.id);
 
   } else if(mmode==='editUser'){
@@ -2256,12 +2276,17 @@ function doEmailLogin() {
   }
   
   var user = users.find(function(u) { return u.email.toLowerCase() === email; });
-  if (!user) {
-    if (errEl) { errEl.textContent = 'No account found with that email address'; errEl.style.display='block'; }
-    return;
-  }
-  
-  // Check if first-time setup needed
+  if (!uif (!user) {
+    // Try fetching from GitHub before giving up
+    if (errEl) { errEl.textContent = 'Looking up account...'; errEl.style.display='block'; errEl.style.color='var(--teal)'; }
+    await fetchUsersFromGitHub();
+    user = users.find(function(u) { return u.email.toLowerCase() === email; });
+    if (errEl) { errEl.style.color=''; }
+    if (!user) {
+      if (errEl) { errEl.textContent = 'No account found with this email address.'; errEl.style.display='block'; }
+      return;
+    }
+  }// Check if first-time setup needed
   if (user.needsSetup || !user.password) {
     _pendingLoginUser = user;
     document.getElementById('loginStep1').style.display = 'none';
