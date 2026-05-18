@@ -584,16 +584,16 @@ tr:hover td{background:var(--surface2)}
     <div class="page-sub">See which URLs your team visits the most. Keep your team on track toward their goals.</div>
   </div>
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px">
-    <select id="urlMemberFilter" style="padding:6px 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:var(--text1);font-size:13px" onchange="renderUrlActivity()">
+    <select id="urlMemberFilter" style="padding:6px 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:var(--text1);font-size:13px;max-width:180px" onchange="renderUrlActivity()">
       <option value="">All Members</option>
     </select>
-    <select id="urlPeriodFilter" style="padding:6px 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:var(--text1);font-size:13px" onchange="renderUrlActivity()">
+    <select id="urlPeriodFilter" style="padding:6px 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:var(--text1);font-size:13px;max-width:160px" onchange="renderUrlActivity()">
       <option value="today">Today</option>
       <option value="week" selected>This Week</option>
       <option value="month">This Month</option>
       <option value="all">All Time</option>
     </select>
-    <input type="date" id="urlDateFilter" style="padding:6px 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:var(--text1);font-size:13px" onchange="renderUrlActivity()" title="Filter by specific date"/>
+    <input type="date" id="urlDateFilter" style="padding:6px 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:var(--text1);font-size:13px;max-width:160px" onchange="renderUrlActivity()" title="Filter by specific date"/>
     <button class="btn btn-outline" onclick="clearUrlVisits()" style="font-size:12px;padding:5px 12px">Clear All Data</button>
   </div>
   <div class="card" id="urlActivityList"><div style="text-align:center;padding:40px;color:var(--text3)">No URL activity data yet. Start tracking with a website/URL entered in the tracker.</div></div>
