@@ -415,7 +415,7 @@ tr:hover td{background:var(--surface2)}
       <button class="btn btn-lg" onclick="manualSnap()">Screenshot</button>
     </div>
   </div>
-  <div class="notice" id="permNotice">Screenshots are captured automatically every 15 minutes. Screen permission is requested once when you first start tracking.</div>
+  <div class="notice" id="permNotice" style="display:flex;align-items:flex-start;gap:10px"><span style="font-size:20px;flex-shrink:0">&#128247;</span><span>Screenshots are captured automatically <strong>every 15 minutes</strong>. When prompted by your browser, please select <strong>&ldquo;Entire Screen&rdquo;</strong> (not a window or tab) so your full activity is captured correctly.</span></div>
   <div class="metric-grid">
     <div class="metric"><div class="metric-label">Today</div><div class="metric-value" id="m-today">0h 0m</div><div class="metric-sub">tracked</div></div>
     <div class="metric"><div class="metric-label">Sessions</div><div class="metric-value" id="m-sessions">0</div><div class="metric-sub">today</div></div>
@@ -755,6 +755,24 @@ tr:hover td{background:var(--surface2)}
 </main>
 </div>
 
+<!-- SCREEN SHARE INSTRUCTION OVERLAY -->
+<div id="ssInstructOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--surface);border-radius:16px;padding:36px 40px;max-width:480px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+    <div style="font-size:52px;margin-bottom:16px">&#128247;</div>
+    <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:12px">Share Your Entire Screen</div>
+    <div style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:20px">
+      Your browser will now ask you to choose what to share.<br><br>
+      <strong style="color:var(--text)">Important:</strong> Please select the <strong style="color:var(--teal)">&ldquo;Entire Screen&rdquo;</strong> tab&nbsp;&#128196; &mdash; <em>not</em> a window or browser tab &mdash; so your full activity is captured correctly.
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <div style="background:var(--surface2);border:2px solid var(--teal);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;color:var(--teal)">&#9989; Entire Screen</div>
+      <div style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:12px 20px;font-size:13px;color:var(--text3);text-decoration:line-through">Window</div>
+      <div style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:12px 20px;font-size:13px;color:var(--text3);text-decoration:line-through">Tab</div>
+    </div>
+    <div style="margin-top:20px;font-size:12px;color:var(--text3)">&#8987; Waiting for your selection&hellip;</div>
+  </div>
+</div>
+
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
 <div class="modal">
@@ -1079,9 +1097,21 @@ async function startTimer(){
   document.getElementById('permNotice').style.display='none';
   tInt = setInterval(()=>{ secs++; document.getElementById('timerDisp').textContent=fmtS(secs); if(curSess) curSess.duration=secs; updateMetrics(); if(secs % 120 === 0) syncSessionsToGitHub(); },1000);
   if(!screenOk){
-    try{ stream=await navigator.mediaDevices.getDisplayMedia({video:true}); screenOk=true; schedSS(); }
-    catch(e){ document.getElementById('ssLabel').textContent='Screen access denied'; }
-  } else schedSS();
+    // Show pre-prompt instruction overlay
+    var _ssInstr = document.getElementById('ssInstructOverlay');
+    if(_ssInstr) _ssInstr.style.display='flex';
+    try{
+      stream=await navigator.mediaDevices.getDisplayMedia({preferCurrentTab:false,video:{displaySurface:'monitor'},audio:false});
+      screenOk=true;
+      if(_ssInstr) _ssInstr.style.display='none';
+      schedSS();
+      capShot(); // take first screenshot immediately
+    }
+    catch(e){
+      if(_ssInstr) _ssInstr.style.display='none';
+      document.getElementById('ssLabel').textContent='Screen access denied. Click Start again to retry.';
+    }
+  } else { schedSS(); capShot(); }
 }
 
 function schedSS(){ clearInterval(ssInt); ssInt=setInterval(capShot, 15*60*1000); }
