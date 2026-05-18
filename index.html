@@ -1316,7 +1316,7 @@ function renderDashboard(){
   const projectMap = {};
   
   weekSess.forEach(s=>{
-    const dur = s.duration||0;
+    const dur = (s.duration||0) * 1000;
     totalWeekMs += dur;
     if(s.activity!==undefined){totalActivity+=s.activity;actCount++;}
     const proj = s.project||'No project';
