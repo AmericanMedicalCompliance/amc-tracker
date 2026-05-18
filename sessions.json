@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": 1,
+    "uid": 6,
+    "project": "Untitled",
+    "category": "Work",
+    "start": "2026-05-18T15:36:30.579Z",
+    "duration": 1537,
+    "date": "2026-05-18",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": []
+  },
+  {
+    "id": 3,
+    "uid": 6,
+    "project": "Untitled",
+    "category": "Work",
+    "start": "2026-05-18T16:26:03.777Z",
+    "duration": 1,
+    "date": "2026-05-18",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": []
+  }
+]
