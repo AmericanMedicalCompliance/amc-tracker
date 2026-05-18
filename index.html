@@ -1448,14 +1448,7 @@ function renderDashboard(){
   const todayUserData = allU.map(u=>{
     const uSess = todaySess.filter(s=>s.uid===u.id);
     var _now = Date.now();
-    const totalMs = uSess.reduce(function(a,s) {
-      var secs = s.duration || 0;
-      if (!s.end && s.start) {
-        var _elapsed = Math.floor((_now - new Date(s.start).getTime()) / 1000);
-        secs = Math.max(secs, _elapsed);
-      }
-      return a + secs * 1000;
-    }, 0);
+    const totalMs = uSess.reduce(function(a,s) { return a + (s.duration || 0) * 1000; }, 0);
     const acts = uSess.filter(s=>s.activity!==undefined);
     const avgAct = acts.length>0 ? Math.round(acts.reduce((a,s)=>a+s.activity,0)/acts.length) : 0;
     const lastSess = uSess.sort((a,b)=>new Date(b.start)-new Date(a.start))[0];
