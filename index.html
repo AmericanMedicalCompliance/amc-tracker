@@ -968,6 +968,9 @@ let auditLog = [
 
 let nuid=6,nsid=1,nlid=1,nhid=14,napid=3,naudid=2;
 let cu=null, tInt=null, ssInt=null, secs=0, running=false, stream=null, screenOk=false, curSess=null;
+let mouseCount=0, keyCount=0;
+document.addEventListener('mousemove', function(){ mouseCount++; });
+document.addEventListener('keydown', function(){ keyCount++; });
 let pieO=null, barO=null, rptBarO=null;
 let mmode='', medit=null, webhookUrl='', activeAlerts=[];
 
@@ -1091,8 +1094,11 @@ async function capShot(){
     cv.getContext('2d').drawImage(bmp,0,0);
     const dataUrl=cv.toDataURL('image/jpeg',.5);
     const ts=Date.now();
+    // Capture activity counts and reset
+    const snapMouse=mouseCount, snapKeys=keyCount;
+    mouseCount=0; keyCount=0;
     // Push immediately with dataUrl for instant preview
-    const ssEntry={url:dataUrl,time:new Date(),uploading:true};
+    const ssEntry={url:dataUrl,time:new Date(),uploading:true,mouse:snapMouse,keys:snapKeys};
     curSess.screenshots.push(ssEntry);
     document.getElementById('ssLabel').textContent='Captured '+new Date().toLocaleTimeString()+' (uploading...)';
     renderActivity();
@@ -1101,7 +1107,7 @@ async function capShot(){
       const resp=await fetch('/upload-screenshot',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({imageData:dataUrl,userId:cu?cu.id:'unknown',sessionId:curSess.id,timestamp:ts})
+        body:JSON.stringify({imageData:dataUrl,userId:cu?cu.id:'unknown',sessionId:curSess.id,timestamp:ts,mouse:snapMouse,keys:snapKeys})
       });
       if(resp.ok){
         const result=await resp.json();
@@ -1420,9 +1426,14 @@ function renderDashboard(){
     ssArea.innerHTML = usersWithSS.map(({u,screenshots})=>{
       const initials = (u.name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
       const ssHTML = screenshots.map(ss=>`
-        <img class="dash-screenshot-thumb" src="${ss.dataUrl||ss.url}" alt="screenshot"
-          onclick="(function(){document.getElementById('ss-img').src=this.src;document.getElementById('ss-modal').style.display='flex'}).call(this)"
-          title="Click to expand"/>`).join('');
+        <div style="display:inline-block;text-align:center;margin:0 4px 8px 0">
+          <img class="dash-screenshot-thumb" src="${ss.dataUrl||ss.url}" alt="screenshot"
+            onclick="(function(){document.getElementById('ss-img').src=this.src;document.getElementById('ss-modal').style.display='flex'}).call(this)"
+            title="Click to expand" style="display:block"/>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px;white-space:nowrap">
+            &#128432; ${ss.mouse||0} &nbsp; &#9000; ${ss.keys||0}
+          </div>
+        </div>`).join('');
       return `<div style="margin-bottom:16px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
           <div class="avatar-circle" style="width:28px;height:28px;font-size:10px;flex-shrink:0">${initials}</div>
@@ -1560,7 +1571,7 @@ function renderScreenshots() {
       if (selDate === 'today' && d.toDateString() !== todayStr) return;
       if (selDate === 'week' && d < weekAgo) return;
       if (selDate === 'month' && d < monthAgo) return;
-      if (ss.url || ss.dataUrl) allSS.push({src: ss.url || ss.dataUrl, date: d, user: user});
+      if (ss.url || ss.dataUrl) allSS.push({src: ss.url || ss.dataUrl, date: d, user: user, mouse: ss.mouse||0, keys: ss.keys||0});
     });
   });
   allSS.sort(function(a,b){return b.date-a.date;});
@@ -1590,7 +1601,12 @@ function renderScreenshots() {
       shtml += timeStr + ' - ' + nm;
       shtml += '">' +
         '<img src="' + ss.src + '" style="width:100%;height:140px;object-fit:cover;display:block" onerror="this.parentElement.style.display=\'none\'" alt="ss"/>' +
-        '<div style="padding:6px 8px;font-size:11px;color:var(--text3)">' + timeStr + '</div></div>';
+        '<div style="padding:6px 8px;">' +
+        '<div style="font-size:11px;color:var(--text3);margin-bottom:3px">' + timeStr + '</div>' +
+        '<div style="display:flex;gap:10px;font-size:11px;color:var(--text2)">' +
+        '<span title="Mouse movements">&#128432; ' + ss.mouse + ' moves</span>' +
+        '<span title="Keystrokes">&#9000; ' + ss.keys + ' keys</span>' +
+        '</div></div></div>';
     });
     html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;">';
     html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">';
