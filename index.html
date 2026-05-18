@@ -1060,6 +1060,12 @@ function doLogin(){
   av.textContent = ini(u.name); av.style.cssText = avStyle(u.color);
   if(u.role==='admin'||u.role==='manager'){
     document.querySelectorAll('.admin-only').forEach(el=>el.style.display='');
+  } else {
+    var _isLead = teams.some(function(t){return t.lead===u.id;});
+    if(_isLead){
+      var _dashNav=document.querySelector('.nav-item.admin-only[onclick*="dashboard"]');
+      if(_dashNav)_dashNav.style.display='';
+    }
   }
   document.getElementById('trackerDate').textContent = new Date().toLocaleDateString([],{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   updateMetrics(); renderActivity();
@@ -1129,6 +1135,20 @@ function setActPeriod(p) {
   _sABtn(_abt, p==='today'); _sABtn(_abw, p==='week'); _sABtn(_abm, p==='month');
   var _afd=document.getElementById('actFilterDate'); if(_afd)_afd.value=''; window._actDate=null;
   renderActivity();
+}
+
+function getMyTeamMemberIds(){
+  if(!window._currentUser) return [];
+  var cu2 = window._currentUser;
+  var myTeams = teams.filter(function(t){return t.lead===cu2.id;});
+  var memberIds = [];
+  myTeams.forEach(function(t){if(t.members)t.members.forEach(function(id){if(memberIds.indexOf(id)===-1)memberIds.push(id);});});
+  return memberIds;
+}
+
+function isTeamLead(){
+  if(!window._currentUser) return false;
+  return teams.some(function(t){return t.lead===window._currentUser.id;});
 }
 
 function setDashDate(val){
@@ -1436,7 +1456,9 @@ function fetchAndCacheGHSessions(callback) {
 }
 
 function renderDashboard(){
-  const allU = users.filter(u=>u.role!=='admin');
+  var _isTLDash = isTeamLead();
+  var _tlMemberIdsDash = _isTLDash ? getMyTeamMemberIds() : [];
+  const allU = _isTLDash ? users.filter(function(u){return _tlMemberIdsDash.indexOf(u.id)!==-1;}) : users.filter(u=>u.role!=='admin');
   var _lsSess = JSON.parse(localStorage.getItem('amc_sessions')||'[]');
   var allSess = (window.ghSessions && window.ghSessions.length > 0) ? window.ghSessions : _lsSess;
   
@@ -1606,8 +1628,10 @@ function renderActivity(expandUid){
   if(actTitle) actTitle.textContent = isAdmin ? 'Performance' : 'Activity log';
   var _actPerLabel = (window._actPeriod||'week')==='today' ? 'today' : (window._actPeriod||'week')==='month' ? 'this month' : 'this week';
   if(actSub) actSub.textContent = isAdmin ? ('Team performance ' + _actPerLabel) : 'All your tracked sessions';
-  if(isAdmin){
-    const allUsers = users.filter(function(u){return u.id;});
+  var _isTL = isTeamLead();
+  var _tlMemberIds = _isTL ? getMyTeamMemberIds() : [];
+  if(isAdmin||_isTL){
+    const allUsers = isAdmin ? users.filter(function(u){return u.id;}) : users.filter(function(u){return _tlMemberIds.indexOf(u.id)!==-1;});
     const now = new Date();
     const todayStr2 = todayStr();
   var _actPer = window._actPeriod || 'week';
@@ -1705,7 +1729,9 @@ function renderScreenshots() {
   if (!area) return;
   var _ghOrLocal = (window.ghSessions && window.ghSessions.length > 0) ? window.ghSessions : (typeof sessions !== 'undefined' && sessions.length > 0) ? sessions : JSON.parse(localStorage.getItem('amc_sessions') || '[]');
   var allSess = _ghOrLocal
-  var allU = users.filter(function(u) { return u.role !== 'admin'; });
+  var _isTLScr = isTeamLead();
+  var _tlMemberIdsScr = _isTLScr ? getMyTeamMemberIds() : [];
+  var allU = _isTLScr ? users.filter(function(u){return _tlMemberIdsScr.indexOf(u.id)!==-1;}) : users.filter(function(u) { return u.role !== 'admin'; });
   var userFilter = document.getElementById('ss-filter-user');
   if (userFilter && userFilter.options.length === 1) {
     allU.forEach(function(u) {
@@ -1807,7 +1833,9 @@ function renderInsights(selectedUid){
   if(isAdmin){
     var selectorHtml = '<div id="adminInsightsPanel" style="margin-bottom:16px">';
     selectorHtml += '<div class="card" style="margin-bottom:12px"><div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px">&#128202; All Team Overview  click a row for full insights</div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="border-bottom:2px solid var(--border)"><th style="padding:8px 10px;text-align:left;color:var(--text2);font-weight:500">User</th><th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500">Today</th><th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500">This Week</th><th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500">Sessions</th><th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500">Top Project</th><th style="padding:8px 10px;text-align:center;color:var(--text2);font-weight:500">Detail</th></tr></thead><tbody>';
-    var allUsersIns = users.filter(function(u){return u.id;});
+    var _isTLIns = isTeamLead();
+    var _tlMemberIdsIns = _isTLIns ? getMyTeamMemberIds() : [];
+    var allUsersIns = _isTLIns ? users.filter(function(u){return _tlMemberIdsIns.indexOf(u.id)!==-1;}) : users.filter(function(u){return u.id;});
     allUsersIns.forEach(function(u){
       var ts=0,wk=0,cnt=0; var pm={};
       sessions.filter(function(s){return s.uid===u.id&&s.duration;}).forEach(function(s){
@@ -1995,7 +2023,7 @@ function exportCSV(){
 //              LEAVES                                                                                                                                                                                                                                                                                                                                                                                                                         
 function populateLvFilter(){
   const el=document.getElementById('lvUFilt'); const cv=el.value;
-  const emps=cu.role==='admin'?users:users.filter(u=>u.id===cu.id);
+  const emps=cu.role==='admin'?users:(isTeamLead()?users.filter(function(u){return getMyTeamMemberIds().indexOf(u.id)!==-1;}):users.filter(u=>u.id===cu.id));
   el.innerHTML='<option value="">All users</option>'+emps.map(u=>`<option value="${u.id}"${cv==u.id?' selected':''}>${u.name}</option>`).join('');
 }
 
@@ -2024,7 +2052,9 @@ function renderLeaveBalances(){
 
 function renderLeaveLog(){
   const uf=document.getElementById('lvUFilt').value; const tf=document.getElementById('lvTFilt').value;
-  const filtered=leaves.filter(l=>(!uf||l.uid==uf)&&(!tf||l.type===tf));
+  var _isTLLL = isTeamLead();
+  var _tlMemberIdsLL = _isTLLL ? getMyTeamMemberIds() : null;
+  const filtered=leaves.filter(l=>(_isTLLL?(_tlMemberIdsLL.indexOf(+l.uid)!==-1):true)&&(!uf||l.uid==uf)&&(!tf||l.type===tf));
   const el=document.getElementById('lvTable');
   if(!filtered.length){ el.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text3)">No leave records.</td></tr>'; return; }
   el.innerHTML=[...filtered].reverse().map(l=>{
@@ -2136,6 +2166,7 @@ function renderTeams(){
       '<div style="flex:1">'+
         '<div style="font-size:13px;font-weight:500">'+t.name+'</div>'+
         (t.desc?'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+t.desc+'</div>':'')+
+      (t.lead?'<div style="font-size:11px;color:var(--primary);margin-top:3px">&#128100; Lead: '+(users.find(function(u){return u.id===t.lead;})||{name:'Unknown'}).name+'</div>':'')+
       '</div>'+
       '<div style="display:flex;align-items:center;margin-left:6px">'+avatars+'</div>'+
       '<div style="font-size:11px;color:var(--text3);min-width:60px;text-align:center">'+memberUsers.length+' member'+(memberUsers.length!==1?'s':'')+'</div>'+
@@ -2412,7 +2443,14 @@ function openModal(mode,id){
     const tm=mode==='editTeam'?teams.find(x=>x.id===med):null;
     body='<div class="form-row"><label>Team name</label><input type="text" id="f-tn" value="'+(tm?tm.name:'')+'"/></div>'+
     '<div class="form-row"><label>Description</label><input type="text" id="f-tdesc" value="'+(tm?tm.desc||'':'')+'"/></div>'+
-    '<div class="form-row"><label>Members</label><div id="f-tmembers" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:8px">'+(function(){return users.filter(u=>u.role!=='admin').map(function(u){var checked=tm&&tm.members&&tm.members.indexOf(u.id)!==-1?'checked':'';return '<label style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer"><input type="checkbox" value="'+u.id+'" '+checked+' style="cursor:pointer"/> '+u.name+'</label>';}).join('');})()+'</div></div>';
+    '<div class="form-row"><label>Members</label><div id="f-tmembers" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:8px">'+(function(){return users.filter(u=>u.role!=='admin').map(function(u){var checked=tm&&tm.members&&tm.members.indexOf(u.id)!==-1?'checked':'';return '<label style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer"><input type="checkbox" value="'+u.id+'" '+checked+' style="cursor:pointer"/> '+u.name+'</label>';}).join('');})()+'<div class="form-row" style="margin-top:12px"><label>Team Lead</label>'+
+    '<select id="f-tlead">'+
+    '<option value="">-- Select team lead --</option>'+
+    users.filter(function(u){return u.id;}).map(function(u){
+      var sel=tm&&tm.lead===u.id?' selected':'';
+      return '<option value="'+u.id+'"'+sel+'>'+u.name+'</option>';
+    }).join('')+
+    '</select></div>'+'</div>';
 
   } else if(mode==='addShift'||mode==='editShift'){
     const s=mode==='editShift'?shifts.find(x=>x.id===id):null;
@@ -2491,10 +2529,10 @@ function doModal(){
     var tdesc=document.getElementById('f-tdesc').value.trim();
     if(mmode==='editTeam'){
       var et=teams.find(function(x){return x.id===med;});
-      if(et){et.name=tname;et.desc=tdesc;et.members=tmembers;}
+      if(et){et.name=tname;et.desc=tdesc;et.members=tmembers;et.lead=+document.getElementById('f-tlead').value||null;}
     } else {
       var newTid=teams.length?Math.max.apply(null,teams.map(function(t){return t.id;}))+1:1;
-      teams.push({id:newTid,name:tname,desc:tdesc,members:tmembers});
+      var tlead=+document.getElementById('f-tlead').value||null; teams.push({id:newTid,name:tname,desc:tdesc,members:tmembers,lead:tlead});
     }
     localStorage.setItem('amc_teams',JSON.stringify(teams));
     addAudit(cu.id,'Team '+(mmode==='addTeam'?'created':'edited'),'System',tname);
