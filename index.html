@@ -1105,10 +1105,20 @@ function saveProfile(){
 }
 function setDashPeriod(p) {
   window._dashPeriod = p;
+  var _dbt = document.getElementById('dashFilterToday');
+  var _dbw = document.getElementById('dashFilterWeek');
+  var _dbm = document.getElementById('dashFilterMonth');
+  function _sDBtn(b,a){if(!b)return;b.style.background=a?'var(--accent)':('transparent');b.style.color=a?'#fff':'var(--text2)';b.style.fontWeight=a?'600':'400';}
+  _sDBtn(_dbt, p==='today'); _sDBtn(_dbw, p==='week'); _sDBtn(_dbm, p==='month');
   renderDashboard();
 }
 function setActPeriod(p) {
   window._actPeriod = p;
+  var _abt = document.getElementById('actFilterToday');
+  var _abw = document.getElementById('actFilterWeek');
+  var _abm = document.getElementById('actFilterMonth');
+  function _sABtn(b,a){if(!b)return;b.style.background=a?'var(--accent)':('transparent');b.style.color=a?'#fff':'var(--text2)';b.style.fontWeight=a?'600':'400';}
+  _sABtn(_abt, p==='today'); _sABtn(_abw, p==='week'); _sABtn(_abm, p==='month');
   renderActivity();
 }
 
