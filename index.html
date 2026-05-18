@@ -1618,7 +1618,7 @@ function renderDashboard(){
     var _fiveMin = 5 * 60 * 1000;
     var _sessStart = lastSess ? new Date(lastSess.start).getTime() : 0;
     var _elapsed = lastSess ? (Date.now() - _sessStart) : 0;
-    var _recentlyActive = lastSess && !lastSess.end && _elapsed < (lastSess.duration || 0) * 1000 + _fiveMin;
+    var _lastActive = _sessStart + (lastSess&&lastSess.duration?lastSess.duration*1000:0); var _recentlyActive = lastSess && !lastSess.end && (Date.now() - _lastActive) < _fiveMin;
     const isWorking = _recentlyActive;
     return {u, totalMs, avgAct, isWorking, lastProject: lastSess?.project||'No project'};
   }).sort((a,b)=>b.totalMs-a.totalMs);
