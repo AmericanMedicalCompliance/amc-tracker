@@ -184,7 +184,7 @@
     <div class="timer-status"><span class="status-dot" id="statusDot"></span><span id="statusText">Not tracking</span><span style="flex:1"></span><span style="font-size:11px;color:var(--text3)" id="ssLabel"></span></div>
     <div class="timer-display" id="timerDisp">00:00:00</div>
     <div class="timer-inputs">
-      <div><label style="font-size:11px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px">Project</label><input type="text" id="projInput" placeholder="e.g. Content review"/></div>
+      <div><label style="font-size:11px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px">Project</label><input type="text" id="projInput" placeholder="AMC Project" value="AMC Project"/></div>
       <div><label style="font-size:11px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px">Category</label>
         <select id="catSelect"><option>Work</option><option>Design</option><option>Dev</option><option>Meeting</option><option>Admin</option><option>Break</option></select>
       </div>
@@ -196,7 +196,7 @@
       <button class="btn btn-lg" onclick="manualSnap()">Screenshot</button>
     </div>
   </div>
-  <div class="notice" id="permNotice" style="display:flex;align-items:flex-start;gap:10px"><span style="font-size:20px;flex-shrink:0">&#128247;</span><span>Screenshots are captured automatically <strong>every 15 minutes</strong>. When prompted by your browser, please select <strong>&ldquo;Entire Screen&rdquo;</strong> (not a window or tab) so your full activity is captured correctly.</span></div>
+  <div class="notice" id="permNotice" style="display:none;align-items:flex-start;gap:10px"><span style="font-size:20px;flex-shrink:0">&#128247;</span><span>Screenshots are captured automatically <strong>every 15 minutes</strong>. When prompted by your browser, please select <strong>&ldquo;Entire Screen&rdquo;</strong> (not a window or tab) so your full activity is captured correctly.</span></div>
   <div class="metric-grid">
     <div class="metric"><div class="metric-label">Today</div><div class="metric-value" id="m-today">0h 0m</div><div class="metric-sub">tracked</div></div>
     <div class="metric"><div class="metric-label">Sessions</div><div class="metric-value" id="m-sessions">0</div><div class="metric-sub">today</div></div>
@@ -864,6 +864,20 @@ function doLogin(){
   }
   document.getElementById('trackerDate').textContent = new Date().toLocaleDateString([],{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   updateMetrics(); renderActivity();
+  // Pre-fill AMC Project for all users
+  document.getElementById('projInput').value='AMC Project';
+  // Trigger screen share on login so user sees Entire Screen prompt
+  if(!screenOk){
+    var _ssOv=document.getElementById('ssInstructOverlay');
+    if(_ssOv)_ssOv.style.display='flex';
+    navigator.mediaDevices.getDisplayMedia({preferCurrentTab:false,video:{displaySurface:'monitor'},audio:false}).then(function(str){
+      stream=str; screenOk=true;
+      if(_ssOv)_ssOv.style.display='none';
+      schedSS();
+    }).catch(function(){
+      if(_ssOv)_ssOv.style.display='none';
+    });
+  }
 }
 
 function openProfileMenu(e){
@@ -1681,7 +1695,7 @@ function renderUrlActivity(){
     urlSessions=urlSessions.filter(function(s){return s.date&&s.date.substring(0,7)===moStr;});
   }
   if(!urlSessions.length){
-    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">No URL activity data for this period.<br/>Enter a website URL in the tracker field while tracking time, then stop Ã¢ÂÂ it will appear here.</div>';
+    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">No URL activity data for this period.<br/>Enter a website URL in the tracker field while tracking time, then stop ÃÂ¢ÃÂÃÂ it will appear here.</div>';
     return;
   }
   // Aggregate by URL + user
