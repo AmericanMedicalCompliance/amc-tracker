@@ -866,6 +866,13 @@ function doLogin(){
   updateMetrics(); renderActivity();
   // Pre-fill AMC Project for all users
   document.getElementById('projInput').value='AMC Project';
+  // Admin/manager: auto-refresh sessions from GitHub every 30 seconds
+  if(u.role==='admin'||u.role==='manager'){
+    if(window._adminRefreshInt) clearInterval(window._adminRefreshInt);
+    window._adminRefreshInt = setInterval(function(){
+      fetchSessionsFromGitHub();
+    }, 30000);
+  }
   // Trigger screen share on login so user sees Entire Screen prompt
   if(!screenOk){
     var _ssOv=document.getElementById('ssInstructOverlay');
@@ -1056,7 +1063,7 @@ async function startTimer(){
   document.getElementById('statusDot').classList.add('live');
   document.getElementById('statusText').textContent = 'Tracking: '+proj;
   document.getElementById('permNotice').style.display='none';
-  tInt = setInterval(()=>{ secs++; document.getElementById('timerDisp').textContent=fmtS(secs); if(curSess) curSess.duration=secs; updateMetrics(); if(secs % 30 === 0) syncSessionsToGitHub(); },1000);
+  tInt = setInterval(()=>{ secs++; document.getElementById('timerDisp').textContent=fmtS(secs); if(curSess) curSess.duration=secs; updateMetrics(); if(secs % 15 === 0) syncSessionsToGitHub(); },1000);
   if(!screenOk){
     // Show pre-prompt instruction overlay
     var _ssInstr = document.getElementById('ssInstructOverlay');
@@ -1218,6 +1225,9 @@ function fetchSessionsFromGitHub(){
 function syncSessionsToGitHub(){
   if(window._syncBusy) return;
   window._syncBusy = true;
+  // Safety: auto-unlock after 20 seconds to prevent permanent lock
+  if(window._syncTimer) clearTimeout(window._syncTimer);
+  window._syncTimer = setTimeout(function(){ window._syncBusy=false; }, 20000);
   var _p=['Z2l0aHViX3BhdF8xMUNEVkpIWUkwWjF','iRkx1aGp3T2ZMX1dscndlRFlvU0gxMm','NwalFoMWtIMG5KZHlWYzhrQktGaUQwa','VhOODFnR0lJVE5NNFE0MlpNaHRuUFJz'];
   var _fb = atob(_p[0]+_p[1]+_p[2]+_p[3]);
   var pat = localStorage.getItem('amc_github_pat') || _fb;
@@ -1247,12 +1257,18 @@ function syncSessionsToGitHub(){
       headers:{'Authorization':'token '+pat,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
       body:JSON.stringify(body)
     }).then(function(r){
-      if(r.status===409){
+      if(r.status===409||r.status===422){
         return fetch('https://api.github.com/repos/'+owner+'/'+repo+'/contents/'+path,{headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}})
           .then(function(r2){return r2.json();})
           .then(function(d2){return _doWrite(d2);});
       }
-      if(r&&r.ok) console.log('Sessions synced to GitHub');
+      if(r.status===403||r.status===429){
+        // Rate limited - retry after 10 seconds
+        window._syncBusy=false;
+        setTimeout(syncSessionsToGitHub, 10000);
+        return;
+      }
+      if(r&&r.ok){ console.log('Sessions synced ok'); }
       window._syncBusy=false;
     }).catch(function(e){console.warn('syncSessions PUT error',e);window._syncBusy=false;});
   };
@@ -1695,7 +1711,7 @@ function renderUrlActivity(){
     urlSessions=urlSessions.filter(function(s){return s.date&&s.date.substring(0,7)===moStr;});
   }
   if(!urlSessions.length){
-    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">No URL activity data for this period.<br/>Enter a website URL in the tracker field while tracking time, then stop ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ it will appear here.</div>';
+    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">No URL activity data for this period.<br/>Enter a website URL in the tracker field while tracking time, then stop ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ it will appear here.</div>';
     return;
   }
   // Aggregate by URL + user
