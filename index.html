@@ -1483,7 +1483,7 @@ function syncSessionsToGitHub(){
     });
     var others=existing.filter(function(s){return s.uid!==cu.id;});
     var existingMine=existing.filter(function(s){return s.uid===cu.id;});
-    var _allMerged=others.concat(existingMine).concat(mySessions);
+    var _allMerged=others.concat(mySessions).concat(existingMine);
     var _seenKeys={};
     var merged=_allMerged.filter(function(s){
       var _k=s.uid+'_'+(s.start instanceof Date?s.start.toISOString():s.start);
