@@ -596,5 +596,18 @@
       }
     ],
     "url": null
+  },
+  {
+    "id": 43,
+    "uid": 6,
+    "project": "Untitled",
+    "category": "Work",
+    "start": "2026-05-20T12:54:20.623Z",
+    "duration": 0,
+    "date": "2026-05-20",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
   }
 ]
