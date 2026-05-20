@@ -651,7 +651,15 @@
 </div>
 </div>
 
-<script>//              DATA                                                                                                                                                                                                                                                                                                                                                                                                                                     
+<script>
+// AUTO VERSION CHECK
+(function(){
+  var _ver="v20260519r12";
+  var _prev=sessionStorage.getItem("amc_ver");
+  sessionStorage.setItem("amc_ver",_ver);
+  if(_prev&&_prev!==_ver){ location.reload(true); }
+})();
+//              DATA                                                                                                                                                                                                                                                                                                                                                                                                                                     
 const SHAREPOINT = 'https://americanmedical.sharepoint.com/:f:/s/AMCdata/IgAOUGFK5WryRJg0l0L7kH2wAVpFB3sH4n4ykFYRlaoa5ME?e=3mUcRe';
 const AV_COLORS = [['#E1F5EE','#0F6E56'],['#E6F1FB','#185FA5'],['#EEEDFE','#4C1D95'],['#FAEEDA','#92400E'],['#FAECE7','#9B2C13'],['#EAF3DE','#14532D']];
 const CHART_COLORS = ['#4a86a8','#2563EB','#D97706','#7C3AED','#E14B2A','#16A34A','#DC2626'];
@@ -853,6 +861,18 @@ function doLogin(){
   cu = u;
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='flex';
+  // Check if running latest version
+  fetch('/?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(html){
+    if(html.indexOf('v20260519r12')<0){
+      var _banner=document.createElement('div');
+      _banner.id='update-banner';
+      _banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#3d7ab0;color:#fff;text-align:center;padding:10px;font-size:13px;cursor:pointer';
+      _banner.innerHTML='New version available - click here to update';
+      _banner.onclick=function(){ location.reload(true); };
+      document.body.appendChild(_banner);
+    }
+  }).catch(function(){});
+
   document.getElementById('sidebarName').textContent = u.name;
   document.getElementById('sidebarRole').textContent = u.role==='admin'?'Administrator':u.role==='manager'?'Manager':'User';
   const av = document.getElementById('sidebarAv');
