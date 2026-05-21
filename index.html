@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<!-- AMC Tracker v20260520r3 - EmailJS OTP configured -->
-<!-- AMC Tracker v20260520r3 - OTP Login Build -->
+<!-- AMC Tracker v20260521r1 - fix OTP email template ID -->
+<!-- AMC Tracker v20260521r1 - OTP Login Build -->
 <html lang="en">
 <head>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -18,7 +18,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
     window._ejsService = 'service_htov20o';
-    window._ejsTemplate = 'template_7tfo7l9';
+    window._ejsTemplate = 'template_rxwgrxh';
     window._ejsKey = 'UtSJy9T6gDV_UQeJV';
     window.addEventListener('load', function() {
       if (window.emailjs && window._ejsKey !== 'YOUR_EMAILJS_PUBLIC_KEY') {
@@ -2735,7 +2735,7 @@ async function doEmailLogin() {
   window._otp = otp;
   window._otpExpiry = Date.now() + 10 * 60 * 1000;
   window._loginIsSetup = user.needsSetup ? true : false;
-  sendOTPEmail(email, otp);
+  await sendOTPEmail(email, otp);
   document.getElementById('loginStep1').style.display = 'none';
   document.getElementById('loginStep2').style.display = 'block';
   var disp = document.getElementById('otpEmailDisplay');
