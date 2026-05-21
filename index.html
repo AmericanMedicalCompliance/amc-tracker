@@ -3026,7 +3026,7 @@ function submitManualTime(){
   const appr={id:napid++,uid:cu.id,type:'Time Adjustment',detail:dateVal+' '+startVal+'   '+endVal+(noteVal?'     '+noteVal:''),startTs:startTs,endTs:endTs,note:noteVal,duration:dur,status:'pending',submitted:todayStr()};
   approvals.push(appr);
   addAudit(cu.id,'Manual time submitted','Time',appr.detail);
-  closeManualTimeModal();
+  closeManualTimeModal(); window.goTo=goTo; window.showInner=showInner; window.toggleAdminNav=toggleAdminNav; window.openProfileMenu=openProfileMenu; window.renderTeams=renderTeams; window.startTimer=startTimer; window.stopTimer=stopTimer;
   showToast('\u2713 Time request submitted for admin approval','success');
 }
 })();
