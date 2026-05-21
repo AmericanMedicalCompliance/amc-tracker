@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<!-- AMC Tracker v20260521r3 - fix OTP email template ID -->
-<!-- AMC Tracker v20260521r3 - OTP Login Build -->
+<!-- AMC Tracker v20260521r4 - fix OTP email template ID -->
+<!-- AMC Tracker v20260521r4 - OTP Login Build -->
 <html lang="en">
 <head>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -3062,18 +3062,6 @@ function submitManualTime(){
   <svg width="28" height="28" viewBox="0 0 23 23" fill="none"><path d="M1 1h10v10H1z" fill="white" opacity="0.9"/><path d="M12 1h10v10H12z" fill="white" opacity="0.7"/><path d="M1 12h10v10H1z" fill="white" opacity="0.7"/><path d="M12 12h10v10H12z" fill="white" opacity="0.9"/></svg>
 </button>
 
-<script>
-      if (u && u.password && !u.needsSetup) {
-        // Mark this device as trusted so no OTP is required on auto-restore
-        try { markDeviceTrusted(u.email); } catch(e) {}
-        completeLogin(u);
-      } else {
-        // User still needs setup - clear saved uid so login shows normally
-        localStorage.removeItem('amc_logged_in_uid');
-      }
-    }
-  } catch(e) {}
-});
 
 
 // ===== CHART RENDERING =====
