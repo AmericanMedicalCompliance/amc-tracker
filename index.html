@@ -2668,7 +2668,7 @@ function sendOTPEmail(email, otp) {
   }
 }
 function startOTPTimer() {
-  var timeLeft = 300; // 5 minutes
+  var timeLeft = 600; // 10 minutes
   clearInterval(_otpTimerInterval);
   _otpTimerInterval = setInterval(function() {
     timeLeft--;
@@ -2681,7 +2681,7 @@ function startOTPTimer() {
       clearInterval(_otpTimerInterval);
       var el2 = document.getElementById('otpTimer');
       if (el2) el2.textContent = 'Code expired. Please resend.';
-      _currentOTP = null;
+      _currentOTP = null; localStorage.removeItem('amc_otp'); localStorage.removeItem('amc_otp_expiry');
     }
   }, 1000);
 }
@@ -2719,7 +2719,7 @@ async function doEmailLogin() {
   window._pendingLoginUser = user;
   var otp = generateOTP();
   window._otp = otp;
-  window._otpExpiry = Date.now() + 10 * 60 * 1000;
+  window._otpExpiry = Date.now() + 10 * 60 * 1000; localStorage.setItem('amc_otp', otp); localStorage.setItem('amc_otp_expiry', String(window._otpExpiry));
   window._loginIsSetup = user.needsSetup ? true : false;
   await sendOTPEmail(email, otp);
   document.getElementById('loginStep1').style.display = 'none';
@@ -2734,7 +2734,7 @@ async function doEmailLogin() {
 
 function verifyOtp() {
   var entered = (document.getElementById('otpInput') || {}).value || '';
-  var errEl = document.getElementById('otpError');
+  var errEl = document.getElementById('otpError'); if (!_currentOTP) { var _ls=localStorage.getItem('amc_otp'),_le=parseInt(localStorage.getItem('amc_otp_expiry')||'0',10); if(_ls&&Date.now()<=_le){_currentOTP=_ls;_otpExpiry=_le;} else{localStorage.removeItem('amc_otp');localStorage.removeItem('amc_otp_expiry');} }
   
   if (!_currentOTP) {
     if (errEl) { errEl.textContent = 'OTP has expired. Please resend.'; errEl.style.display='block'; }
@@ -2760,7 +2760,7 @@ function resendOtp() {
   _otpExpiry = Date.now() + 300000;
   sendOTPEmail(_pendingLoginUser.email, _currentOTP);
   startOTPTimer();
-  var errEl = document.getElementById('otpError');
+  var errEl = document.getElementById('otpError'); if (!_currentOTP) { var _ls=localStorage.getItem('amc_otp'),_le=parseInt(localStorage.getItem('amc_otp_expiry')||'0',10); if(_ls&&Date.now()<=_le){_currentOTP=_ls;_otpExpiry=_le;} else{localStorage.removeItem('amc_otp');localStorage.removeItem('amc_otp_expiry');} }
   if (errEl) { errEl.textContent = 'New code sent!'; errEl.style.color='#27ae60'; errEl.style.display='block'; }
   setTimeout(function() { if (errEl) { errEl.style.display='none'; errEl.style.color='#e74c3c'; } }, 3000);
 }
