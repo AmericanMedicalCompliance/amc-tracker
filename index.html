@@ -53,6 +53,19 @@
       <button id="loginContinueBtn" onclick="doEmailLogin()" style="width:100%;background:#4a86a8;color:white;border:none;padding:14px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">Send Verification Code</button>
     </div>
     
+        <!-- Microsoft Sign-In -->
+    <div id="loginStep1MS" style="margin-top:12px;">
+      <div style="display:flex;align-items:center;gap:10px;margin:16px 0 12px;">
+        <div style="flex:1;height:1px;background:#e0e0e0;"></div>
+        <span style="font-size:12px;color:#999;white-space:nowrap;">or sign in with</span>
+        <div style="flex:1;height:1px;background:#e0e0e0;"></div>
+      </div>
+      <button onclick="connectMS365()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1.5px solid #d0d0d0;border-radius:8px;padding:12px;font-size:15px;font-weight:600;color:#333;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='#fff'">
+        <svg width="20" height="20" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="9" height="9" fill="#F25022"/><rect x="11" y="1" width="9" height="9" fill="#7FBA00"/><rect x="1" y="11" width="9" height="9" fill="#00A4EF"/><rect x="11" y="11" width="9" height="9" fill="#FFB900"/></svg>
+        Sign in with Microsoft
+      </button>
+    </div>
+    
     <!-- Step 2: OTP Verification -->
     <div id="loginStep2" style="display:none;">
       <div style="background:#e8f1f7;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:#2d6080;">
