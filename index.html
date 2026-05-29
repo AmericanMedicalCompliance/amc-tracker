@@ -2839,24 +2839,21 @@ function toggleMS365() {
 }
 
 function connectMS365() {
-  var redirectUri = location.origin + location.pathname;
-  if (redirectUri.slice(-1) !== '/') redirectUri += '/';
   function _b64url(buf){ return btoa(String.fromCharCode.apply(null,new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,''); }
   var verifier = _b64url(crypto.getRandomValues(new Uint8Array(32)));
-  crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)).then(function(hash){
-    var challenge = _b64url(hash);
-    try { sessionStorage.setItem('ms365_pkce_verifier', verifier); } catch(e) {}
-    var authUrl = 'https://login.microsoftonline.com/' + window.MS365_CONFIG.tenantId +
-      '/oauth2/v2.0/authorize?client_id=' + window.MS365_CONFIG.clientId +
-      '&response_type=code' +
-      '&redirect_uri=' + encodeURIComponent(redirectUri) +
-      '&scope=' + encodeURIComponent(window.MS365_CONFIG.scopes.join(' ')) +
-      '&code_challenge=' + challenge +
-      '&code_challenge_method=S256' +
-      '&state=ms365auth';
-    try { localStorage.setItem('ms365_auth_pending', '1'); } catch(e) {}
-    location.href = authUrl;
-  });
+  try { sessionStorage.setItem('ms365_pkce_verifier', verifier); } catch(e) {}
+  var redirectUri = location.origin + location.pathname;
+  if (redirectUri.slice(-1) !== '/') redirectUri += '/';
+  var authUrl = 'https://login.microsoftonline.com/' + window.MS365_CONFIG.tenantId +
+    '/oauth2/v2.0/authorize?client_id=' + window.MS365_CONFIG.clientId +
+    '&response_type=code' +
+    '&redirect_uri=' + encodeURIComponent(redirectUri) +
+    '&scope=' + encodeURIComponent(window.MS365_CONFIG.scopes.join(' ')) +
+    '&code_challenge=' + verifier +
+    '&code_challenge_method=plain' +
+    '&state=ms365auth';
+  try { localStorage.setItem('ms365_auth_pending', '1'); } catch(e) {}
+  location.href = authUrl;
 }
 function checkMS365AuthReturn() {
   var params = new URLSearchParams(location.search);
