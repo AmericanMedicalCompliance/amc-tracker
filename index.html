@@ -496,6 +496,13 @@
       <button class="btn btn-sm" onclick="testWH()">Test ping</button>
       <span id="whSt" class="badge badge-gray">Not configured</span>
     </div>
+    <div class="card-title" style="margin-top:8px">Microsoft Teams webhook</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <input type="text" id="teamsUrl" placeholder="https://outlook.office.com/webhook/... (Teams Incoming Webhook URL)" style="flex:1;min-width:200px"/>
+      <button class="btn btn-primary btn-sm" onclick="saveTeams()">Save</button>
+      <button class="btn btn-sm" onclick="testTeams()">Test ping</button>
+      <span id="teamsSt" class="badge badge-gray">Not configured</span>
+    </div>
     <div class="card-title" style="margin-top:8px">Alert thresholds</div>
     <div class="form-grid">
       <div class="form-row"><label>Min daily hours</label><input type="number" id="th-d" value="6" min="1" max="12" step=".5"/></div>
@@ -508,6 +515,7 @@
     <div class="btn-group" style="margin-top:12px">
       <button class="btn" onclick="runAlerts()">Re-scan</button>
       <button class="btn btn-primary" onclick="pushAlerts()">Push to n8n</button>
+      <button class="btn btn-primary" onclick="sendAlertsToTeams()">Send to Teams</button>
       <span id="pushSt" style="font-size:12px;color:var(--text2);align-self:center"></span>
     </div>
   </div>
@@ -2361,6 +2369,11 @@ function runAlerts(){
 async function saveWH(){ const v=document.getElementById('whUrl').value.trim(); if(!v){alert('Enter URL.');return;} webhookUrl=v; const sp=document.getElementById('whSt'); sp.className='badge badge-teal'; sp.textContent='Saved'; addAudit(cu.id,'Webhook saved','System','n8n webhook configured'); }
 async function testWH(){ if(!webhookUrl){alert('Save URL first.');return;} const sp=document.getElementById('whSt'); sp.className='badge badge-amber'; sp.textContent='Pinging...'; try{ await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'ping',source:'AMC Time Tracker',ts:new Date().toISOString()})}); sp.className='badge badge-teal'; sp.textContent='Ping OK'; }catch(e){ sp.className='badge badge-red'; sp.textContent='Failed'; } }
 async function pushAlerts(){ if(!webhookUrl){alert('Save webhook URL first.');return;} if(!activeAlerts.length){document.getElementById('pushSt').textContent='No alerts to push.';return;} document.getElementById('pushSt').textContent='Sending...'; try{ await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source:'AMC Time Tracker',timestamp:new Date().toISOString(),alert_count:activeAlerts.length,alerts:activeAlerts.map(a=>({user:a.name,type:a.type,severity:a.sev,message:a.msg,ts:new Date().toISOString()}))})}); document.getElementById('pushSt').textContent=activeAlerts.length+' alerts pushed'; addAudit(cu.id,'Alerts pushed','System',activeAlerts.length+' HR alerts sent to n8n'); }catch(e){ document.getElementById('pushSt').textContent='Push failed        check URL'; } }
+var teamsWebhookUrl = '';
+async function saveTeams(){ var v = document.getElementById('teamsUrl').value.trim(); if(!v){ alert('Enter the Microsoft Teams webhook URL.'); return; } teamsWebhookUrl = v; var sp = document.getElementById('teamsSt'); sp.className = 'badge badge-teal'; sp.textContent = 'Saved'; try { addAudit(cu.id, 'Teams webhook saved', 'System', 'Microsoft Teams webhook configured'); } catch(e){} }
+async function testTeams(){ if(!teamsWebhookUrl){ alert('Save the Teams webhook URL first.'); return; } var sp = document.getElementById('teamsSt'); sp.className = 'badge badge-amber'; sp.textContent = 'Pinging...'; var card = { '@type':'MessageCard', '@context':'http://schema.org/extensions', themeColor:'4a86a8', summary:'AMC Time Tracker test', title:'AMC Time Tracker - test ping', text:'This is a test message from the AMC Time Tracker HR alerts integration.' }; try { await fetch(teamsWebhookUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(card)}); sp.className='badge badge-teal'; sp.textContent='Connected'; } catch(e){ sp.className='badge badge-red'; sp.textContent='Failed - check URL'; } }
+async function sendAlertsToTeams(){ if(!teamsWebhookUrl){ alert('Save the Teams webhook URL first.'); return; } if(!activeAlerts.length){ document.getElementById('pushSt').textContent='No alerts to send.'; return; } document.getElementById('pushSt').textContent='Sending to Teams...'; var facts = activeAlerts.map(function(a){ return { name: a.name + ' (' + a.type.replace(/_/g,' ') + ')', value: a.msg }; }); var card = { '@type':'MessageCard', '@context':'http://schema.org/extensions', themeColor:'e74c3c', summary:'AMC HR Alerts (' + activeAlerts.length + ')', title:'AMC Time Tracker - HR Alerts (' + activeAlerts.length + ')', sections:[ { activitySubtitle: new Date().toLocaleString(), facts: facts } ] }; try { await fetch(teamsWebhookUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(card)}); document.getElementById('pushSt').textContent = activeAlerts.length + ' alerts sent to Teams'; try { addAudit(cu.id, 'Alerts sent to Teams', 'System', activeAlerts.length + ' HR alerts sent to Microsoft Teams'); } catch(e){} } catch(e){ document.getElementById('pushSt').textContent='Teams send failed - check URL'; } }
+window.saveTeams = saveTeams; window.testTeams = testTeams; window.sendAlertsToTeams = sendAlertsToTeams;
 
 //              AUDIT                                                                                                                                                                                                                                                                                                                                                                                                                               
 function buildAuditFilters(){ const el=document.getElementById('audUser'); if(!cu) return; if(cu.role!=='admin'){el.value=cu.id;el.closest&&el.closest('div')&&(el.closest('div').style.display='none');return;} el.closest&&el.closest('div')&&(el.closest('div').style.display=''); const cv=el.value; el.innerHTML='<option value="">All users</option>'+users.map(u=>`<option value="${u.id}"${cv==u.id?' selected':''}>${u.name}</option>`).join(''); }
