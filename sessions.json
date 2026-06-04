@@ -2922,11 +2922,18 @@
     "project": "AMC Project",
     "category": "Work",
     "start": "2026-06-04T16:54:58.045Z",
-    "duration": 2,
+    "duration": 16,
     "date": "2026-06-04",
     "type": "tracked",
     "manual": false,
-    "screenshots": [],
+    "screenshots": [
+      {
+        "url": "https://pub-a4e2d07f3868410181b72afe397c0020.r2.dev/screenshots/uid_5/94_1780592101808.jpg",
+        "time": "2026-06-04T16:55:01.808Z",
+        "mouse": 1092,
+        "keys": 20
+      }
+    ],
     "url": null
   }
 ]
