@@ -831,7 +831,7 @@ async function fetchUsersFromGitHub() {
     let added = 0;
     data.users.forEach(u => {
       if (deleted.includes(u.id)) return; // skip deleted
-      if (users.find(x => x.id === u.id || x.email === u.email)) return; // already exists
+      var _ex = users.find(x => x.id === u.id || x.email === u.email); if (_ex) { if (u.pwh && !_ex.pwh) _ex.pwh = u.pwh; return; } // already exists (merge pwh)
             users.push(u);
       added++;
     });
@@ -3099,13 +3099,27 @@ function _amcHashPwd(pwd) {
 }
 function getStoredPassword(email) {
   if (!email) return null;
-  var map = JSON.parse(localStorage.getItem('amc_passwords') || '{}');
-  return map[email.toLowerCase()] || null;
+  var e = email.toLowerCase();
+  var map = JSON.parse(localStorage.getItem('amc_pwds') || '{}');
+  if (map[e]) return map[e];
+  // Fall back to the server-stored hash on the user record (works on any device)
+  try {
+    var u = (users || []).find(function(x){ return x.email && x.email.toLowerCase() === e; });
+    if (u && u.pwh) { map[e] = u.pwh; localStorage.setItem('amc_pwds', JSON.stringify(map)); return u.pwh; }
+  } catch(err) {}
+  return null;
 }
 function setStoredPassword(email, pwd) {
-  var map = JSON.parse(localStorage.getItem('amc_passwords') || '{}');
-  map[email.toLowerCase()] = _amcHashPwd(pwd);
-  localStorage.setItem('amc_passwords', JSON.stringify(map));
+  var e = email.toLowerCase();
+  var hash = _amcHashPwd(pwd);
+  var map = JSON.parse(localStorage.getItem('amc_pwds') || '{}');
+  map[e] = hash;
+  localStorage.setItem('amc_pwds', JSON.stringify(map));
+  // Persist to the server so the password works on every device
+  try {
+    var u = (users || []).find(function(x){ return x.email && x.email.toLowerCase() === e; });
+    if (u) { u.pwh = hash; if (typeof syncUsersToGitHub === 'function') { syncUsersToGitHub(); } }
+  } catch(err) {}
 }
 function checkStoredPassword(email, pwd) {
   var stored = getStoredPassword(email);
