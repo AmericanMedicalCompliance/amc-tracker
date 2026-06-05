@@ -1149,13 +1149,6 @@ function doLogin(){
       if(_ssOv)_ssOv.style.display='none';schedTS();
     }).catch(function(){if(_ssOv)_ssOv.style.display='none';});
   } else if(!screenOk&&localStorage.getItem('amc_screen_granted')){screenOk=true;}
-      stream=str; screenOk=true;
-      if(_ssOv)_ssOv.style.display='none';
-      schedSS();
-    }).catch(function(){
-      if(_ssOv)_ssOv.style.display='none';
-    });
-  }
 }
 
 function openProfileMenu(e){
