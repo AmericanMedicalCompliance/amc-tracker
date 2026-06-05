@@ -146,8 +146,7 @@
               +'<div><label style="'+lbl+'">Period end</label><input type="date" id="pr-periodEnd" style="'+fld+'"></div>'
               +'<div><label style="'+lbl+'">Payment date</label><input type="date" id="pr-payDate" style="'+fld+'"></div>'
               +'<button class="btn btn-primary" id="pr-gen">Generate</button>'
-              +'<button class="btn btn-secondary" id="pr-csv">Export CSV</button></div></div>'
-        <button onclick="emailPayroll()" class="btn btn-secondary btn-sm" style="margin-left:8px">&#128231; Email Payroll</button>
+              +'<button class="btn btn-secondary" id="pr-csv">Export CSV</button><button onclick="emailPayroll()" class="btn btn-secondary btn-sm" style="margin-left:8px">&#128231; Email Payroll</button></div></div>'
               +'<div class="card"><div class="pr-wrap"><table class="pr-table"><thead><tr>'+ths+'</tr><tr class="pr-reqrow">'+reqs+'</tr></thead><tbody id="pr-tbody"></tbody></table></div></div>';
               anyPage.parentElement.appendChild(page);
               document.getElementById('pr-gen').addEventListener('click',renderPayroll);
