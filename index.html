@@ -21,14 +21,14 @@
               if(!sb) return;
               if(running){
                       sb.textContent='Pause tracking';
-                      sb.classList.remove('btn-primary');
+                      sb.classList.remove('btn-danger');
                       sb.classList.add('btn-warning');
                       sb.style.display='flex';
                       if(tb) tb.style.display='none';
               } else {
                       sb.textContent='Start tracking';
                       sb.classList.remove('btn-warning');
-                      sb.classList.add('btn-primary');
+                      sb.classList.add('btn-danger');
                       sb.style.display='flex';
                       if(tb) tb.style.display='none';
               }
@@ -162,8 +162,8 @@
 <style>
   /* ===== AMC UI FIXES (added) ===== */
   .inner-sec{display:none;}
-  .btn-warning{background:#ef4444;color:#fff;box-shadow:0 1px 4px rgba(239,68,68,.3);}
-  .btn-warning:hover{background:#dc2626;box-shadow:0 2px 8px rgba(239,68,68,.4);}
+  .btn-warning{background:#22c55e;color:#fff;box-shadow:0 1px 4px rgba(34,197,94,.3);}
+  .btn-warning:hover{background:#16a34a;box-shadow:0 2px 8px rgba(34,197,94,.4);}
   .inner-sec.active{display:block;}
   .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .table-wrap table{min-width:760px;}
@@ -402,7 +402,7 @@
       <div style="flex:1;min-width:180px"><label style="font-size:11px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px">Website / URL</label><input type="text" id="urlInput" placeholder="e.g. docs.google.com, salesforce.com" style="width:100%;padding:8px 10px;border-radius:var(--r-sm);border:1px solid var(--border);font-size:13px;background:var(--surface);color:var(--text1)"/></div>
     </div>
     <div class="timer-actions">
-      <button class="btn btn-primary btn-lg" id="startBtn" onclick="startTimer()">Start tracking</button>
+      <button class="btn btn-danger btn-lg" id="startBtn" onclick="startTimer()">Start tracking</button>
       <button class="btn btn-lg" id="stopBtn" onclick="stopTimer()" disabled>Stop</button>
       <button class="btn btn-lg" onclick="manualSnap()">Screenshot</button>
     </div>
