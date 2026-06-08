@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- AMC Tracker v20260608r10 - fix syntax error in gustoSync log + MS sign-in working: employee hours + contractor payments sync -->
+<!-- AMC Tracker v20260608r11 - fix syntax error in gustoSync log + MS sign-in working: employee hours + contractor payments sync -->
 <!-- AMC Tracker v20260521r5 - OTP Login Build -->
 <html lang="en">
 <head>
@@ -115,6 +115,31 @@
                       ['.pr-hrs','.pr-rate','.pr-bonus','.pr-reimb'].forEach(function(sel){tr.querySelector(sel).addEventListener('input',recalc);});
                       recalc();
               });
+        (function(){
+          var totalHrs=0,totalWage=0,totalBonus=0,totalReimb=0,totalPay=0;
+          var rows=tb.querySelectorAll('tr');
+          rows.forEach(function(r){
+            totalHrs+=parseFloat((r.querySelector('.pr-hrs')||{value:'0'}).value)||0;
+            totalWage+=parseFloat(((r.querySelector('.pr-wage')||{}).textContent||'0').replace(/[^0-9.-]/g,''))||0;
+            totalBonus+=parseFloat((r.querySelector('.pr-bonus')||{value:'0'}).value)||0;
+            totalReimb+=parseFloat((r.querySelector('.pr-reimb')||{value:'0'}).value)||0;
+            totalPay+=parseFloat(((r.querySelector('.pr-total')||{}).textContent||'0').replace(/[^0-9.-]/g,''))||0;
+          });
+          var tfoot=document.createElement('tfoot');
+          tfoot.innerHTML='<tr style="background:#e8f4e8;font-weight:700;border-top:2px solid #22c55e">'+
+            '<td colspan="7" style="text-align:right;padding:8px 12px;color:#16a34a">&#128176; TOTALS</td>'+
+            '<td class="pr-num" style="color:#16a34a">'+totalHrs.toFixed(2)+'</td>'+
+            '<td></td>'+
+            '<td class="pr-num" style="color:#16a34a">$'+totalWage.toFixed(2)+'</td>'+
+            '<td class="pr-num" style="color:#16a34a">$'+totalBonus.toFixed(2)+'</td>'+
+            '<td class="pr-num" style="color:#16a34a">$'+totalReimb.toFixed(2)+'</td>'+
+            '<td class="pr-num" style="color:#16a34a;font-size:1.05em">$'+totalPay.toFixed(2)+'</td>'+
+            '<td></td></tr>';
+          var tbl=tb.closest('table');
+          if(tbl){var oldFoot=tbl.querySelector('tfoot');if(oldFoot)oldFoot.remove();tbl.appendChild(tfoot);}
+          var sb=document.getElementById('pr-summary-bar');
+          if(sb){sb.innerHTML='<span>&#128101; <b>'+rows.length+'</b> employees</span>'+'<span style="margin-left:20px">&#9203; Total hours: <b>'+totalHrs.toFixed(2)+'</b></span>'+'<span style="margin-left:20px">&#128176; Total payroll: <b>$'+totalPay.toFixed(2)+'</b></span>';}
+        })();
         }
         function exportCSV(){
               var head=['Contractor First Name','Contractor Last Name','Contractor ID','Email','Pay Period Start (MM/DD/YYYY)','Pay Period End (MM/DD/YYYY)','Payment Date (MM/DD/YYYY)','Hours Worked','Hourly Rate ($)','Wage Earnings ($)','Bonus ($)','Reimbursement ($)','Total Payment ($)','Memo / Notes'];
@@ -147,6 +172,7 @@
               +'<div><label style="'+lbl+'">Payment date</label><input type="date" id="pr-payDate" style="'+fld+'"></div>'
               +'<button class="btn btn-primary" id="pr-gen">Generate</button>'
               +'<button class="btn btn-secondary" id="pr-csv">Export CSV</button><button onclick="emailPayroll()" class="btn btn-secondary btn-sm" style="margin-left:8px">&#128231; Email Payroll</button></div></div>'
+              +'<div id="pr-summary-bar" style="display:flex;gap:24px;padding:10px 16px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;margin-bottom:12px;font-size:0.95em;color:#15803d;align-items:center;flex-wrap:wrap"></div>'
               +'<div class="card"><div class="pr-wrap"><table class="pr-table"><thead><tr>'+ths+'</tr><tr class="pr-reqrow">'+reqs+'</tr></thead><tbody id="pr-tbody"></tbody></table></div></div>';
               anyPage.parentElement.appendChild(page);
               document.getElementById('pr-gen').addEventListener('click',renderPayroll);
@@ -2557,7 +2583,7 @@ function renderUsers(){
     const lb=u.leaveBalance||{}; const bal=(lb.vacation||0)+(lb.sick||0)+(lb.personal||0);
     const dept=departments.find(d=>d.id===u.dept);
     const shift=shifts.find(s=>s.id===u.shift);
-    const inv=u.invited?'<span class="badge badge-green">sent</span>':`<button class="btn btn-sm btn-success" onclick="sendInvite(${u.id})">Send</button>`;
+    const inv=(u.invited&&!u.needsSetup)?'<span class="badge badge-green">sent</span>':`<button class="btn btn-sm btn-success" onclick="sendInvite(${u.id})">${u.invited?'Resend':'Send'}</button>`;
     return `<tr>
       <td><div class="av av-sm" style="${avStyle(u.color)}">${ini(u.name)}</div></td>
       <td><div style="font-size:13px;font-weight:500">${u.name}</div><div style="font-size:11px;color:var(--text2)">${u.jobTitle||''}</div></td>
