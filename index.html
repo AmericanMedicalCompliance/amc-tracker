@@ -2746,7 +2746,7 @@ function renderTimeAdjPage(){
   var userSel=document.getElementById('taUserSel');
   var dateSel=document.getElementById('taDateSel');
   if(!userSel||!dateSel) return;
-  var users=(window._users&&(window._users.users||window._users))||[];
+  var users=(window._users&&(window._users.users||window._users))||(function(){try{var d=JSON.parse(localStorage.getItem('amc_users_extra'));return d?d.users||d:[];}catch(e){return [];}})();
   if(userSel.options.length<=1){
     users.forEach(function(u){if(u.id===1) return; var opt=document.createElement('option');opt.value=u.id;opt.textContent=u.name;userSel.appendChild(opt);});
   }
