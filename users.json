@@ -108,7 +108,7 @@
       },
       "needsSetup": true,
       "color": 5,
-      "pin": "0000"
+      "pin": "Gumral"
     },
     {
       "id": 11,
@@ -130,7 +130,7 @@
       },
       "needsSetup": true,
       "color": 0,
-      "pin": "0000"
+      "pin": "Gumral"
     },
     {
       "id": 12,
@@ -152,7 +152,7 @@
       },
       "needsSetup": true,
       "color": 1,
-      "pin": "0000"
+      "pin": "Gumral"
     },
     {
       "id": 13,
@@ -174,7 +174,7 @@
       },
       "needsSetup": true,
       "color": 2,
-      "pin": "0000"
+      "pin": "Gumral"
     },
     {
       "id": 14,
@@ -196,7 +196,7 @@
       },
       "needsSetup": true,
       "color": 3,
-      "pin": "0000"
+      "pin": "Gumral"
     },
     {
       "id": 15,
@@ -218,7 +218,7 @@
       },
       "needsSetup": true,
       "color": 4,
-      "pin": "0000"
+      "pin": "Gumral"
     },
     {
       "id": 16,
@@ -240,7 +240,7 @@
       },
       "needsSetup": true,
       "color": 5,
-      "pin": "0000"
+      "pin": "Gumral"
     },
     {
       "id": 17,
@@ -262,9 +262,9 @@
       },
       "needsSetup": true,
       "color": 0,
-      "pin": "0000"
+      "pin": "Gumral"
     }
   ],
-  "updated": "2026-06-08T18:48:47.890Z",
+  "updated": "2026-06-08T19:39:44.223Z",
   "note": "AMC Time Tracker user database. Managed automatically by the app."
 }
