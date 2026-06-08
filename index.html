@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- AMC Tracker v20260608r3 - fix syntax error in gustoSync log + MS sign-in working: employee hours + contractor payments sync -->
+<!-- AMC Tracker v20260608r4 - fix syntax error in gustoSync log + MS sign-in working: employee hours + contractor payments sync -->
 <!-- AMC Tracker v20260521r5 - OTP Login Build -->
 <html lang="en">
 <head>
@@ -358,6 +358,9 @@
     <button class="nav-item admin-only" style="display:none" onclick="goTo('titles')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><line x1="16" y1="21" x2="16" y2="7"/><line x1="8" y1="21" x2="8" y2="7"/></svg>Titles &amp; Holidays
     </button>
+    <button class="nav-item admin-only" style="display:none" onclick="goTo('integrations')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="12" x2="5" y2="16"/><line x1="12" y1="12" x2="19" y2="16"/></svg>Integrations
+    </button>
     <button class="nav-item admin-only" style="display:none" onclick="goTo('alerts')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z"/><path d="M16 21a2 2 0 0 1-4 0 2 2 0 0 1 4 0z"/></svg>HR Alerts
     </button>
@@ -679,6 +682,68 @@
         <div class="metric"><div class="metric-label">Sick</div><div class="metric-value">4d</div></div>
         <div class="metric"><div class="metric-label">Personal</div><div class="metric-value">2d</div></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- INTEGRATIONS PAGE -->
+<div class="page" id="page-integrations">
+  <div class="page-header"><div class="page-title">Integrations</div><div class="page-sub">Connect AMC Tracker with Gusto and n8n</div></div>
+
+  <!-- Gusto Integration -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title" style="display:flex;align-items:center;gap:10px">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 8v4l3 3"/></svg>
+      Gusto Payroll
+    </div>
+    <p style="color:var(--text-muted);margin-bottom:16px;font-size:14px">Sync contractor hours and payroll data directly to Gusto. Once configured, payroll periods will automatically push to your Gusto account.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Gusto API Token</label>
+        <input type="password" id="gusto-api-token" placeholder="Bearer token from Gusto" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text)">
+      </div>
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Company ID</label>
+        <input type="text" id="gusto-company-id" placeholder="Gusto Company UUID" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text)">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="alert('Gusto integration coming soon!')" style="padding:8px 18px;background:var(--primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px">Save &amp; Connect</button>
+      <button onclick="alert('Gusto integration coming soon!')" style="padding:8px 18px;background:var(--bg-hover,#f0f0f0);color:var(--text);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px">Test Connection</button>
+    </div>
+    <div style="margin-top:12px;padding:10px 14px;background:#f8f9fa;border-radius:8px;font-size:13px;color:var(--text-muted)">
+      <strong>Status:</strong> Not connected &nbsp;&#8212;&nbsp; <a href="https://developer.gusto.com" target="_blank" style="color:var(--primary)">View Gusto API Docs</a>
+    </div>
+  </div>
+
+  <!-- n8n Integration -->
+  <div class="card">
+    <div class="card-title" style="display:flex;align-items:center;gap:10px">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      n8n Workflow Automation
+    </div>
+    <p style="color:var(--text-muted);margin-bottom:16px;font-size:14px">Connect AMC Tracker to n8n to automate workflows — trigger payroll exports, send notifications, sync data with other tools, and more.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">n8n Webhook URL</label>
+        <input type="text" id="n8n-webhook-url" placeholder="https://your-n8n.app/webhook/..." style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text)">
+      </div>
+      <div style="flex:1;min-width:200px">
+        <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Event Trigger</label>
+        <select id="n8n-trigger" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text)">
+          <option value="payroll">Payroll Generated</option>
+          <option value="clockin">Employee Clock-In</option>
+          <option value="clockout">Employee Clock-Out</option>
+          <option value="leave">Leave Submitted</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="alert('n8n integration coming soon!')" style="padding:8px 18px;background:var(--primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px">Save Webhook</button>
+      <button onclick="alert('n8n integration coming soon!')" style="padding:8px 18px;background:var(--bg-hover,#f0f0f0);color:var(--text);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px">Send Test Event</button>
+    </div>
+    <div style="margin-top:12px;padding:10px 14px;background:#f8f9fa;border-radius:8px;font-size:13px;color:var(--text-muted)">
+      <strong>Status:</strong> Not configured &nbsp;&#8212;&nbsp; <a href="https://docs.n8n.io/integrations/builtin/trigger-nodes/n8n-nodes-base.webhook/" target="_blank" style="color:var(--primary)">View n8n Webhook Docs</a>
     </div>
   </div>
 </div>
