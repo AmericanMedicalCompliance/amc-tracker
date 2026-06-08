@@ -1383,7 +1383,7 @@ function goTo(name){
   if(name==='alerts') runAlerts();
   if(name==='audit'){ buildAuditFilters(); renderAudit(); }  if(name==='screenshots'){ fetchAndCacheGHSessions(function(){renderScreenshots();}); }
   if(name==='urlactivity'){ fetchAndCacheGHSessions(function(){renderUrlActivity();}); }
-  if(page==='integrations'&&typeof renderIntegrations==='function'){renderIntegrations();}
+  if(name==='integrations'&&typeof renderIntegrations==='function'){renderIntegrations();}
 
 }
 
