@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- AMC Tracker v20260608r4 - fix syntax error in gustoSync log + MS sign-in working: employee hours + contractor payments sync -->
+<!-- AMC Tracker v20260608r5 - fix syntax error in gustoSync log + MS sign-in working: employee hours + contractor payments sync -->
 <!-- AMC Tracker v20260521r5 - OTP Login Build -->
 <html lang="en">
 <head>
@@ -1054,12 +1054,26 @@ async function syncUsersToGitHub() {
     if (resp.ok) {
       const result = await resp.json();
       console.log('AMC: Synced ' + result.count + ' users to GitHub via server function');
+      // Remove any existing sync warning
+      var wb = document.getElementById('_syncWarnBanner'); if (wb) wb.remove();
     } else {
-      console.warn('AMC: sync-users returned', resp.status);
+      const errData = await resp.json().catch(()=>({}));
+      console.warn('AMC: sync-users returned', resp.status, errData);
+      _showSyncWarning('User sync failed (HTTP ' + resp.status + '): ' + (errData.error || 'Unknown error') + '. New users may not be able to sign in on other devices. Please check the GITHUB_PAT in Cloudflare Pages settings.');
     }
   } catch(e) {
     console.warn('AMC: sync-users failed:', e.message);
+    _showSyncWarning('User sync failed: ' + e.message + '. New users may not be able to sign in on other devices.');
   }
+}
+function _showSyncWarning(msg) {
+  var existing = document.getElementById('_syncWarnBanner');
+  if (existing) existing.remove();
+  var banner = document.createElement('div');
+  banner.id = '_syncWarnBanner';
+  banner.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#c0392b;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;max-width:600px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.3);';
+  banner.innerHTML = '&#9888; ' + msg + ' <button onclick="this.parentElement.remove()" style="margin-left:12px;background:transparent;border:1px solid #fff;color:#fff;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:12px">Dismiss</button>';
+  document.body.appendChild(banner);
 }
 
 async function fetchUsersFromGitHub() {
