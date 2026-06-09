@@ -3857,5 +3857,18 @@
     "manual": false,
     "screenshots": [],
     "url": null
+  },
+  {
+    "id": 135,
+    "uid": 17,
+    "project": "AMC Project",
+    "category": "Dev",
+    "start": "2026-06-09T12:14:41.145Z",
+    "duration": 1,
+    "date": "2026-06-09",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
   }
 ]
