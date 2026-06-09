@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- AMC Tracker v20260609r15b - Fix syntax error in addLeave modal template literals -->
+<!-- AMC Tracker v20260609r15c - Fix double brace syntax error in addLeave block -->
 <!-- AMC Tracker v20260521r5 - OTP Login Build -->
 <html lang="en">
 <head>
@@ -3466,7 +3466,7 @@ function openModal(mode,id){
       <div class="form-group"><label class="form-label">Notes (optional)</label><textarea id="lv-notes" class="form-control" style="min-height:70px;resize:vertical" placeholder="Reason or additional details..."></textarea></div>
     `;
     footer.innerHTML = '<button class="btn btn-secondary btn-sm" onclick="closeModal()">Cancel</button> <button class="btn btn-primary btn-sm" onclick="submitLeaveRequest()">Submit Request</button>';
-  }} else if(mode==='addTitle'){
+  } else if(mode==='addTitle'){
     body=`<div class="form-row"><label>Job title</label><input type="text" id="f-t" placeholder="e.g. Senior Content Developer"/></div>`;
   } else if(mode==='bulkTitles'){
     body=`<div class="form-row"><label>Paste titles        one per line</label><textarea id="f-bulk" rows="8" placeholder="Senior Developer&#10;Content Manager&#10;..." style="resize:vertical"></textarea></div><div style="font-size:12px;color:var(--text2)">Duplicates are ignored automatically.</div>`;
