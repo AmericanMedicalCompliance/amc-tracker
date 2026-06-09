@@ -1,6 +1,27 @@
 {
   "users": [
     {
+      "id": 1,
+      "name": "Admin User",
+      "email": "amir@amedcompliance.com",
+      "role": "admin",
+      "dept": 0,
+      "shift": 1,
+      "jobTitle": "Administrator",
+      "phone": "",
+      "status": "active",
+      "startDate": "2026-01-01",
+      "invited": true,
+      "manager": 0,
+      "leaveBalance": {
+        "vacation": 12,
+        "sick": 6,
+        "personal": 3
+      },
+      "color": 1,
+      "pwh": "had7d75cc"
+    },
+    {
       "id": 5,
       "name": "Czarina Magana",
       "email": "czarina.magana@amedcompliance.com",
@@ -265,6 +286,6 @@
       "pin": "Gumral"
     }
   ],
-  "updated": "2026-06-09T14:15:29.517Z",
+  "updated": "2026-06-09T15:20:42.119Z",
   "note": "AMC Time Tracker user database. Managed automatically by the app."
 }
