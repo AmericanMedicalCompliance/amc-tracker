@@ -3870,5 +3870,18 @@
       }
     ],
     "url": null
+  },
+  {
+    "id": 136,
+    "uid": 12,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-09T12:25:57.662Z",
+    "duration": 1,
+    "date": "2026-06-09",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
   }
 ]
