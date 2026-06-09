@@ -201,7 +201,7 @@
     {
       "id": 15,
       "name": "German Valenzuela",
-      "email": "german.valenzuela@amedcompliance.com",
+      "email": "german.burgos@amedcompliance.com",
       "role": "employee",
       "dept": 1,
       "shift": 1,
@@ -265,6 +265,6 @@
       "pin": "Gumral"
     }
   ],
-  "updated": "2026-06-09T12:25:20.963Z",
+  "updated": "2026-06-09T14:15:29.517Z",
   "note": "AMC Time Tracker user database. Managed automatically by the app."
 }
