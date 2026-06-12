@@ -8037,11 +8037,18 @@
     "project": "AMC Project",
     "category": "Work",
     "start": "2026-06-12T11:00:43.432Z",
-    "duration": 0,
+    "duration": 16,
     "date": "2026-06-12",
     "type": "tracked",
     "manual": false,
-    "screenshots": [],
+    "screenshots": [
+      {
+        "url": "https://pub-a4e2d07f3868410181b72afe397c0020.r2.dev/screenshots/uid_8/167_1781262047320.jpg",
+        "time": "2026-06-12T11:00:47.320Z",
+        "mouse": 72,
+        "keys": 0
+      }
+    ],
     "url": null
   }
 ]
