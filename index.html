@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- AMC Tracker v20260616r1 - Fix session dedup: use uid+id key to preserve ALL users sessions -->
 <!-- AMC Tracker v20260610r16a - Replace blocking alert with toast notification in leave submit -->
 <!-- AMC Tracker v20260521r5 - OTP Login Build -->
 <html lang="en">
@@ -1585,9 +1586,9 @@ function loadSessions(){
     var savedLegacy = JSON.parse(localStorage.getItem('amc_sessions')||'[]').filter(function(s){return s.uid===uid;});
     var allSaved = saved.concat(savedLegacy);
     if(allSaved.length){
-      var existingIds = sessions.map(function(s){return s.id;});
+      var existingIds = sessions.map(function(s){return s.uid+'_'+s.id;});
       allSaved.forEach(function(s){
-        if(!existingIds.includes(s.id)){
+        if(!existingIds.includes(s.uid+'_'+s.id)){
           s.screenshots = s.screenshots||[];
           if(s.start && typeof s.start === 'string') s.start = new Date(s.start);
           sessions.push(s);
@@ -1609,14 +1610,14 @@ function fetchSessionsFromGitHub(){
   var url = 'https://raw.githubusercontent.com/amedcompliance/amc-tracker/main/sessions.json?_='+Date.now();
   fetch(url).then(function(r){ return r.ok ? r.json() : []; }).then(function(ghSessions){
     if(!Array.isArray(ghSessions)) return;
-    var existingIds = sessions.map(function(s){return s.id;});
+    var existingIds = sessions.map(function(s){return s.uid+'_'+s.id;});
     var added = 0;
     ghSessions.forEach(function(s){
-      if(!existingIds.includes(s.id)){
+      if(!existingIds.includes(s.uid+'_'+s.id)){
         s.screenshots = s.screenshots||[];
         if(s.start && typeof s.start === 'string') s.start = new Date(s.start);
         sessions.push(s);
-        existingIds.push(s.id);
+        existingIds.push(s.uid+'_'+s.id);
         added++;
       }
     });
