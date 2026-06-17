@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- AMC Tracker v20260616r2 - Fix: clear stale active timer if >16h old to prevent 163h display bug -->
 <!-- AMC Tracker v20260616r1 - Fix session dedup: use uid+id key to preserve ALL users sessions -->
 <!-- AMC Tracker v20260610r16a - Replace blocking alert with toast notification in leave submit -->
 <!-- AMC Tracker v20260521r5 - OTP Login Build -->
@@ -4366,7 +4367,8 @@ function resumeActiveTimer(){
     var at=JSON.parse(localStorage.getItem('amc_active_timer')||'null');
     if(!at||!cu||at.uid!==cu.id||!at.startEpoch) return;
     var todayStr=new Date().toISOString().slice(0,10);
-    if(new Date(at.startEpoch).toISOString().slice(0,10)!==todayStr){localStorage.removeItem('amc_active_timer');return;}
+    var _elapsed=Math.floor((Date.now()-at.startEpoch)/1000);
+    if(new Date(at.startEpoch).toISOString().slice(0,10)!==todayStr||_elapsed>57600){localStorage.removeItem('amc_active_timer');return;}
     var pi=document.getElementById('projInput');
     var cs=document.getElementById('catSelect');
     if(pi&&at.project) pi.value=at.project;
