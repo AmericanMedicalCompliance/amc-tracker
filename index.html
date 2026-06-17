@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- AMC Tracker v20260616r4 - Update expired GitHub PAT (no expiry) to restore session sync -->
+<!-- AMC Tracker v20260617r1 - Fix sync PAT key, pagehide save, uid+id dedup, Keep-it resume fix -->
 <!-- AMC Tracker v20260616r3 - Stale session modal: ask user to keep or discard unfinished sessions -->
 <!-- AMC Tracker v20260616r2 - Fix: clear stale active timer if >16h old to prevent 163h display bug -->
 <!-- AMC Tracker v20260616r1 - Fix session dedup: use uid+id key to preserve ALL users sessions -->
@@ -1215,6 +1215,7 @@ document.addEventListener('click', function(){ mouseCount += 3; });
 document.addEventListener('scroll', function(){ mouseCount += 2; }, true);
 document.addEventListener('keypress', function(){ keyCount++; });
 window.addEventListener('storage', function(e){ if(e.key==='amc_activity' && running){ try{ var d=JSON.parse(e.newValue||'{}'); mouseCount+=(d.m||0); keyCount+=(d.k||0); }catch(ex){} } });
+window.addEventListener('pagehide', function(){ if(running && curSess && cu) { try { curSess.duration=secs; var _toSave=sessions.filter(function(s){return s.uid===cu.id;}).map(function(s){ return {id:s.id,uid:s.uid,project:s.project,category:s.category,start:s.start instanceof Date?s.start.toISOString():s.start,duration:s.duration,date:s.date,type:s.type||'tracked',manual:s.manual||false,url:s.url||null,screenshots:[]}; }); localStorage.setItem('amc_sessions_'+cu.id, JSON.stringify(_toSave)); } catch(e){} } });
 let pieO=null, barO=null, rptBarO=null;
 let mmode='', medit=null, webhookUrl='', activeAlerts=[];
 
@@ -1473,7 +1474,7 @@ async function startTimer(){
   document.getElementById('statusDot').classList.add('live');
   document.getElementById('statusText').textContent = 'Tracking: '+proj;
   document.getElementById('permNotice').style.display='none';
-  tInt = setInterval(()=>{ secs++; document.getElementById('timerDisp').textContent=fmtS(secs); if(curSess) curSess.duration=secs; updateMetrics(); if(secs % 15 === 0) syncSessionsToGitHub(); },1000);
+  tInt = setInterval(()=>{ secs++; document.getElementById('timerDisp').textContent=fmtS(secs); if(curSess) curSess.duration=secs; if(cu){try{localStorage.setItem('amc_active_timer',JSON.stringify({uid:cu.id,startEpoch:Date.now()-secs*1000,project:curSess?curSess.project:'',category:curSess?curSess.category:''}));}catch(e){}} updateMetrics(); if(secs % 30 === 0) syncSessionsToGitHub(); },1000);
   if(!screenOk){
     // Show pre-prompt instruction overlay
     var _ssInstr = document.getElementById('ssInstructOverlay');
@@ -1641,10 +1642,7 @@ function syncSessionsToGitHub(){
   // Safety: auto-unlock after 20 seconds to prevent permanent lock
   if(window._syncTimer) clearTimeout(window._syncTimer);
   window._syncTimer = setTimeout(function(){ window._syncBusy=false; }, 20000);
-  var _p=['Z2l0aHViX3BhdF8xMUNEVkpIWUkwWjF','iRkx1aGp3T2ZMX1dscndlRFlvU0gxMm','NwalFoMWtIMG5KZHlWYzhrQktGaUQwa','VhOODFnR0lJVE5NNFE0MlpNaHRuUFJz'];
-  var _fb = atob(_p[0]+_p[1]+_p[2]+_p[3]);
-  var pat = localStorage.getItem('amc_github_pat') || _fb;
-  if(!pat){ window._syncBusy=false; return; }
+  var _gp=localStorage.getItem('_amc_gp'); if(!_gp){window._syncBusy=false;console.warn('AMC sync: no PAT');return;} var pat=atob(_gp);
   var owner='amedcompliance', repo='amc-tracker', path='sessions.json';
   var _doWrite = function(data){
     var existing=[];
@@ -1662,10 +1660,10 @@ function syncSessionsToGitHub(){
     });
     var others=existing.filter(function(s){return s.uid!==cu.id;});
     var existingMine=existing.filter(function(s){return s.uid===cu.id;});
-    var _allMerged=others.concat(mySessions).concat(existingMine);
+    var _myIds={}; mySessions.forEach(function(s){ _myIds[s.uid+'_'+s.id]=true; }); var _extraMine=existingMine.filter(function(s){ return !_myIds[s.uid+'_'+s.id]; }); var _allMerged=others.concat(mySessions).concat(_extraMine);
     var _seenKeys={};
     var merged=_allMerged.filter(function(s){
-      var _k=s.uid+'_'+(s.start instanceof Date?s.start.toISOString():s.start);
+      var _k=s.uid+'_'+s.id;
       if(_seenKeys[_k]) return false;
       _seenKeys[_k]=true; return true;
     });
@@ -4391,7 +4389,23 @@ function resumeActiveTimer(){
       document.getElementById('staleKeepBtn').onclick=function(){
         document.body.removeChild(_overlay);
         secs=Math.max(0,_elapsed);
-        if(typeof startTimer==='function'&&!running) startTimer();
+        running=true;
+        var _proj=at.project||'Untitled', _cat=at.category||'Work';
+        var _pi=document.getElementById('projInput'), _cs=document.getElementById('catSelect');
+        if(_pi&&_proj) _pi.value=_proj;
+        if(_cs&&_cat) _cs.value=_cat;
+        curSess={id:nsid++,uid:cu.id,project:_proj,category:_cat,start:new Date(at.startEpoch),duration:secs,screenshots:[],date:new Date(at.startEpoch).toISOString().slice(0,10),type:'tracked',url:null};
+        sessions.push(curSess);
+        localStorage.setItem('amc_active_timer',JSON.stringify({uid:cu.id,startEpoch:at.startEpoch,project:_proj,category:_cat}));
+        document.getElementById('startBtn').disabled=false;
+        document.getElementById('stopBtn').disabled=false;
+        document.getElementById('timerDisp').classList.add('running');
+        document.getElementById('statusDot').classList.add('live');
+        document.getElementById('statusText').textContent='Tracking: '+_proj;
+        document.getElementById('permNotice').style.display='none';
+        clearInterval(tInt);
+        tInt=setInterval(function(){ secs++; document.getElementById('timerDisp').textContent=fmtS(secs); if(curSess) curSess.duration=secs; if(cu){try{localStorage.setItem('amc_active_timer',JSON.stringify({uid:cu.id,startEpoch:at.startEpoch,project:_proj,category:_cat}));}catch(e){}} updateMetrics(); if(secs%30===0) syncSessionsToGitHub(); },1000);
+        saveSessions();
       };
       document.getElementById('staleDiscardBtn').onclick=function(){
         localStorage.removeItem('amc_active_timer');
