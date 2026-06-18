@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- AMC Tracker v20260617r1 - Fix sync PAT key, pagehide save, uid+id dedup, Keep-it resume fix -->
+<!-- AMC Tracker v20260617r2 - Fix fetchUsersFromGitHub: update email/name from GitHub, refresh localStorage cache -->
 <!-- AMC Tracker v20260616r3 - Stale session modal: ask user to keep or discard unfinished sessions -->
 <!-- AMC Tracker v20260616r2 - Fix: clear stale active timer if >16h old to prevent 163h display bug -->
 <!-- AMC Tracker v20260616r1 - Fix session dedup: use uid+id key to preserve ALL users sessions -->
@@ -1153,14 +1153,17 @@ async function fetchUsersFromGitHub() {
     let added = 0;
     data.users.forEach(u => {
       if (deleted.includes(u.id)) return; // skip deleted
-      var _ex = users.find(x => x.id === u.id || x.email === u.email); if (_ex) { if (u.pwh && !_ex.pwh) _ex.pwh = u.pwh; return; } // already exists (merge pwh)
-            users.push(u);
+      var _ex = users.find(x => x.id === u.id); if (_ex) { if (u.pwh && !_ex.pwh) _ex.pwh = u.pwh; _ex.email = u.email; _ex.name = u.name; _ex.status = u.status; return; } // update email/name from GitHub
+      var _exEmail = users.find(x => x.email === u.email); if (_exEmail) return; // skip exact email dup
+      users.push(u);
       added++;
     });
     if (added > 0) console.log('AMC: Loaded ' + added + ' users from GitHub');
     // Update nuid to be above all loaded user ids
     const maxId = Math.max(...users.map(u => u.id), 5);
     if (nuid <= maxId) nuid = maxId + 1;
+    // Update localStorage cache so refreshed data is used next time
+    try { localStorage.setItem('amc_users_extra', JSON.stringify(users.filter(u=>u.id!==1))); } catch(e) {}
   } catch(e) { console.warn('AMC: Could not fetch users from GitHub:', e.message); }
 }
 
