@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- AMC Tracker v20260617r2 - Fix fetchUsersFromGitHub: update email/name from GitHub, refresh localStorage cache -->
+<!-- AMC Tracker v20260617r3 - Fix timer: skip offline time using heartbeat, only count time device was active -->
 <!-- AMC Tracker v20260616r3 - Stale session modal: ask user to keep or discard unfinished sessions -->
 <!-- AMC Tracker v20260616r2 - Fix: clear stale active timer if >16h old to prevent 163h display bug -->
 <!-- AMC Tracker v20260616r1 - Fix session dedup: use uid+id key to preserve ALL users sessions -->
@@ -1467,7 +1467,7 @@ function showInner(page, sec){  if(page==='admin'&&sec==='gusto'){setTimeout(gus
 async function startTimer(){
   const proj = document.getElementById('projInput').value.trim()||'Untitled';
   const cat = document.getElementById('catSelect').value;
-  secs=0; running=true; var _at=JSON.parse(localStorage.getItem('amc_active_timer')||'null'); if(_at&&cu&&_at.uid===cu.id&&_at.startEpoch){secs=Math.max(0,Math.floor((Date.now()-_at.startEpoch)/1000));} localStorage.setItem('amc_active_timer',JSON.stringify({uid:cu.id,startEpoch:Date.now()-secs*1000,project:proj,category:cat}));
+  secs=0; running=true; var _at=JSON.parse(localStorage.getItem('amc_active_timer')||'null'); if(_at&&cu&&_at.uid===cu.id&&_at.startEpoch){var _hbGap=_at.lastHeartbeat?Math.floor((Date.now()-_at.lastHeartbeat)/1000):9999;secs=(_hbGap>120&&_at.secs)?_at.secs:Math.max(0,Math.floor((Date.now()-_at.startEpoch)/1000));} localStorage.setItem('amc_active_timer',JSON.stringify({uid:cu.id,startEpoch:Date.now()-secs*1000,project:proj,category:cat}));
   var _urlVal=document.getElementById('urlInput')?document.getElementById('urlInput').value.trim():''; var _urlHost=''; if(_urlVal){try{_urlHost=new URL(_urlVal.indexOf('://')!==-1?_urlVal:'https://'+_urlVal).hostname;}catch(e){_urlHost=_urlVal;}} curSess = {id:nsid++,uid:cu.id,project:proj,category:cat,start:new Date(),duration:0,screenshots:[],date:todayStr(),type:'tracked',url:_urlHost||null};
   sessions.push(curSess); setTimeout(syncSessionsToGitHub, 2000);
   saveSessions(); // sync online status immediately
@@ -1477,7 +1477,7 @@ async function startTimer(){
   document.getElementById('statusDot').classList.add('live');
   document.getElementById('statusText').textContent = 'Tracking: '+proj;
   document.getElementById('permNotice').style.display='none';
-  tInt = setInterval(()=>{ secs++; document.getElementById('timerDisp').textContent=fmtS(secs); if(curSess) curSess.duration=secs; if(cu){try{localStorage.setItem('amc_active_timer',JSON.stringify({uid:cu.id,startEpoch:Date.now()-secs*1000,project:curSess?curSess.project:'',category:curSess?curSess.category:''}));}catch(e){}} updateMetrics(); if(secs % 30 === 0) syncSessionsToGitHub(); },1000);
+  tInt = setInterval(()=>{ secs++; document.getElementById('timerDisp').textContent=fmtS(secs); if(curSess) curSess.duration=secs; if(cu){try{localStorage.setItem('amc_active_timer',JSON.stringify({uid:cu.id,startEpoch:Date.now()-secs*1000,secs:secs,lastHeartbeat:Date.now(),project:curSess?curSess.project:'',category:curSess?curSess.category:''}));}catch(e){}} updateMetrics(); if(secs % 30 === 0) syncSessionsToGitHub(); },1000);
   if(!screenOk){
     // Show pre-prompt instruction overlay
     var _ssInstr = document.getElementById('ssInstructOverlay');
@@ -4370,7 +4370,7 @@ function resumeActiveTimer(){
     var at=JSON.parse(localStorage.getItem('amc_active_timer')||'null');
     if(!at||!cu||at.uid!==cu.id||!at.startEpoch) return;
     var todayStr=new Date().toISOString().slice(0,10);
-    var _elapsed=Math.floor((Date.now()-at.startEpoch)/1000);
+    var _hbGap=at.lastHeartbeat?Math.floor((Date.now()-at.lastHeartbeat)/1000):9999; var _elapsed=(_hbGap>120&&at.secs)?at.secs:Math.floor((Date.now()-at.startEpoch)/1000);
     var _isDiffDay=new Date(at.startEpoch).toISOString().slice(0,10)!==todayStr;
     if(_isDiffDay||_elapsed>57600){
       // Show user a choice instead of silently discarding
@@ -4420,7 +4420,7 @@ function resumeActiveTimer(){
     var cs=document.getElementById('catSelect');
     if(pi&&at.project) pi.value=at.project;
     if(cs&&at.category) cs.value=at.category;
-    secs=Math.max(0,Math.floor((Date.now()-at.startEpoch)/1000));
+    var _hbGap2=at.lastHeartbeat?Math.floor((Date.now()-at.lastHeartbeat)/1000):9999; secs=Math.max(0,(_hbGap2>120&&at.secs)?at.secs:Math.floor((Date.now()-at.startEpoch)/1000));
     if(typeof startTimer==='function'&&!running) startTimer();
   }catch(e){console.error('resumeTimer:',e);}
 }
