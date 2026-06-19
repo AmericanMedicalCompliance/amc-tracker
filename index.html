@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- AMC Tracker v20260617r3 - Fix timer: skip offline time using heartbeat, only count time device was active -->
+<!-- AMC Tracker v20260619r1 - Fix timer: skip offline time using heartbeat, only count time device was active -->
 <!-- AMC Tracker v20260616r3 - Stale session modal: ask user to keep or discard unfinished sessions -->
 <!-- AMC Tracker v20260616r2 - Fix: clear stale active timer if >16h old to prevent 163h display bug -->
 <!-- AMC Tracker v20260616r1 - Fix session dedup: use uid+id key to preserve ALL users sessions -->
@@ -1668,7 +1668,10 @@ function syncSessionsToGitHub(){
     var merged=_allMerged.filter(function(s){
       var _k=s.uid+'_'+s.id;
       if(_seenKeys[_k]) return false;
-      _seenKeys[_k]=true; return true;
+      _seenKeys[_k]=true;
+      // Auto-clean: skip zero-duration and artifact sessions >16h (57600s)
+      if(s.duration===0 || s.duration>57600) return false;
+      return true;
     });
     var encoded=btoa(unescape(encodeURIComponent(JSON.stringify(merged,null,2))));
     var body={message:'Update sessions for uid '+cu.id+' [skip ci]',content:encoded};
