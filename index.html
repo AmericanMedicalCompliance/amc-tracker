@@ -1084,7 +1084,7 @@ let rolePerms = {
 };
 const PERM_LABELS = {view_all:'View all user data',edit_users:'Edit user profiles',delete_users:'Delete users',approve_leave:'Approve leave requests',adjust_time:'Adjust time records',view_reports:'View reports',manage_depts:'Manage departments',manage_shifts:'Manage shifts',config_alerts:'Configure HR alerts',push_n8n:'Push to n8n'};
 
-(function(){var _h1='github_pat_11CDVJHYI0qOiIMn2lyPlJ_H9l1oYGciR77bGLH',_h2='DMU3GEhqzGvdDYyfuBYSSJYDUDc6XK5NEVF0sl2vtRK';if(!localStorage.getItem('_amc_gp'))localStorage.setItem('_amc_gp',btoa(_h1+_h2));})();
+(function(){var _h1='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',_h2='DMU3GEhqzGvdDYyfuBYSSJYDUDc6XK5NEVF0sl2vtRK';if(!localStorage.getItem('_amc_gp'))localStorage.setItem('_amc_gp',btoa(_h1+_h2));})();
 let users = [
   {id:1,name:'Admin User',email:'amir@amedcompliance.com',role:'admin',pin:'0000',color:0,dept:2,shift:1,invited:true,status:'active',phone:'555-0100',jobTitle:'CISO and Director of HR',startDate:'2020-01-15',leaveBalance:{vacation:6,sick:4,personal:2, password: "Admin@123!", needsSetup: false},manager:null, password: "Admin@123!", needsSetup: false},
 {id:5,name:'Czarina Magana',email:'czarina.magana@amedcompliance.com',role:'employee',hourlyRate:8.625,pin:'1234',color:4,dept:1,shift:1,invited:true,status:'active',phone:'',jobTitle:'',startDate:'2026-05-13',leaveBalance:{vacation:6,sick:4,personal:2},manager:1, password: "", needsSetup: true},
@@ -1108,7 +1108,7 @@ async function syncUsersToGitHub() {
     const _pat = atob(_gp);
     const usersToSync = users.filter(u => u.id !== 1);
     // Get current users.json SHA from GitHub
-    const ghBase = 'https://api.github.com/repos/amedcompliance/amc-tracker/contents/users.json';
+    const ghBase = 'https://api.github.com/repos/AmericanMedicalCompliance/amc-tracker/contents/users.json';
     const ghHeaders = { 'Authorization': 'token ' + _pat, 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'AMC-Tracker', 'Content-Type': 'application/json' };
     const getResp = await fetch(ghBase, { headers: ghHeaders });
     if (!getResp.ok) { throw new Error('GitHub GET failed: ' + getResp.status); }
@@ -1144,7 +1144,7 @@ function _showSyncWarning(msg) {
 
 async function fetchUsersFromGitHub() {
   try {
-    const url = 'https://raw.githubusercontent.com/amedcompliance/amc-tracker/main/users.json?t=' + Date.now();
+    const url = 'https://raw.githubusercontent.com/AmericanMedicalCompliance/amc-tracker/main/users.json?t=' + Date.now();
     const r = await fetch(url);
     if (!r.ok) return;
     const data = await r.json();
@@ -1614,7 +1614,7 @@ function loadSessions(){
 
 // Fetch ALL sessions from GitHub (shared across devices)
 function fetchSessionsFromGitHub(){
-  var url = 'https://raw.githubusercontent.com/amedcompliance/amc-tracker/main/sessions.json?_='+Date.now();
+  var url = 'https://raw.githubusercontent.com/AmericanMedicalCompliance/amc-tracker/main/sessions.json?_='+Date.now();
   fetch(url).then(function(r){ return r.ok ? r.json() : []; }).then(function(ghSessions){
     if(!Array.isArray(ghSessions)) return;
     var existingIds = sessions.map(function(s){return s.uid+'_'+s.id;});
@@ -1719,7 +1719,7 @@ const CAT_BADGE = {Work:'badge-teal',Design:'badge-blue',Dev:'badge-blue',Meetin
 
 var ghSessions = [];
 function fetchAndCacheGHSessions(callback) {
-  var url = 'https://raw.githubusercontent.com/amedcompliance/amc-tracker/main/sessions.json?_=' + Date.now();
+  var url = 'https://raw.githubusercontent.com/AmericanMedicalCompliance/amc-tracker/main/sessions.json?_=' + Date.now();
   fetch(url).then(function(r) { return r.ok ? r.json() : []; }).then(function(data) {
     if (Array.isArray(data) && data.length > 0) {
       var _seen = {};
