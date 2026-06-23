@@ -12,7 +12,7 @@
 <meta http-Equiv="Expires" content="0">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, iitial-scale=1.0"/>
-<title>AMC Time Tracker</title>
+<title>AMC Time Tracker</title>  <script async crossorigin="anonymous" data-clerk-publishable-key="pk_test_c2V0dGxpbmctc2tpbmstODUuY2xlcmsuYWNjb3VudHMuZGV2JA" src="https://settling-skink-85.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js" type="text/javascript"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -3679,7 +3679,7 @@ function markDeviceTrusted(userEmail) {
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
-function sendOTPEmail(email, otp) {
+function sendOTPEmail(email, otp) {      // Try Clerk email OTP first, fall back to EmailJS      if (window.Clerk && window.Clerk.loaded) {        return window.Clerk.client.signIn.create({          identifier: email,          strategy: 'email_code'        }).then(function(si) {          window._clerkSignIn = si;          return si.prepareFirstFactor({ strategy: 'email_code' });        }).then(function() {          console.log('[Clerk] OTP email sent to ' + email);        }).catch(function(err) {          console.warn('[Clerk] OTP send failed, falling back to EmailJS:', err);          return sendOTPEmailJS(email, otp);        });      }      return sendOTPEmailJS(email, otp);    }    function sendOTPEmailJS(email, otp) {
   if (window._ejsKey && window._ejsKey !== 'YOUR_EMAILJS_PUBLIC_KEY' && window.emailjs) {
     return window.emailjs.send(
       window._ejsService,
@@ -4514,6 +4514,6 @@ function emailPayroll(){
   else{window.location.href='mailto:?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(bod);}
 }
 </script>
-</body>
+<script>window.addEventListener('load',function(){if(window.Clerk){window.Clerk.load({}).then(function(){console.log('[Clerk] Initialized, version: '+window.Clerk.version);}).catch(function(e){console.warn('[Clerk] Init failed:',e);});}});</script></body>
 </html>
  
