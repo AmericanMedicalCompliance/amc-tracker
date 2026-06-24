@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- AMC Tracker v20260624r1 - Fix online status: use session start time (8h window) instead of stale duration for isWorking check -->
 <!-- AMC Tracker v20260623r2 - Fix timer: use wall-clock Date.now() for accurate elapsed time, eliminate setInterval drift -->
 <!-- AMC Tracker v20260616r3 - Stale session modal: ask user to keep or discard unfinished sessions -->
 <!-- AMC Tracker v20260616r2 - Fix: clear stale active timer if >16h old to prevent 163h display bug -->
@@ -1807,7 +1808,7 @@ function renderDashboard(){
     const acts = uSess.filter(s=>s.activity!==undefined);
     const avgAct = acts.length>0 ? Math.round(acts.reduce((a,s)=>a+s.activity,0)/acts.length) : 0;
     const lastSess = uSess.sort((a,b)=>new Date(b.start)-new Date(a.start))[0];
-    var _thirtyMin = 30 * 60 * 1000; var _sessStart = lastSess ? new Date(lastSess.start).getTime() : 0; var _lastActive = _sessStart + (lastSess&&lastSess.duration?lastSess.duration*1000:0); var _recentlyActive = lastSess && !lastSess.end && (Date.now() - _lastActive) < _thirtyMin;
+    var _eightHours = 8 * 60 * 60 * 1000; var _sessStart = lastSess ? new Date(lastSess.start).getTime() : 0; var _recentlyActive = lastSess && !lastSess.end && (Date.now() - _sessStart) < _eightHours;
     const isWorking = _recentlyActive;
     return {u, totalMs, avgAct, isWorking, lastProject: lastSess?.project||'No project'};
   }).sort((a,b)=>b.totalMs-a.totalMs);
