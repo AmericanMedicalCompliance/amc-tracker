@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- AMC Tracker v20260624r1 - Fix online status: use session start time (8h window) instead of stale duration for isWorking check -->
+<!-- AMC Tracker v20260624r2 - Fix offline status: include active (zero-duration) sessions in GitHub sync so admin sees live tracking -->
 <!-- AMC Tracker v20260623r2 - Fix timer: use wall-clock Date.now() for accurate elapsed time, eliminate setInterval drift -->
 <!-- AMC Tracker v20260616r3 - Stale session modal: ask user to keep or discard unfinished sessions -->
 <!-- AMC Tracker v20260616r2 - Fix: clear stale active timer if >16h old to prevent 163h display bug -->
@@ -1660,7 +1660,8 @@ function syncSessionsToGitHub(){
     }
     var mySessions = sessions.filter(function(s){return s.uid===cu.id;}).map(function(s){
       var ss2=(s.screenshots||[]).filter(function(sc){return sc.url&&!sc.url.startsWith('data:');}).map(function(sc){return {url:sc.url,time:sc.time instanceof Date?sc.time.toISOString():sc.time,mouse:sc.mouse||0,keys:sc.keys||0};});
-      return {id:s.id,uid:s.uid,project:s.project,category:s.category,start:s.start instanceof Date?s.start.toISOString():s.start,duration:s.duration,date:s.date,type:s.type||'tracked',manual:s.manual||false,screenshots:ss2,url:s.url||null};
+      var _liveDur = (curSess && curSess.id===s.id && running) ? Math.floor((Date.now()-_timerStartMs)/1000)+secs : s.duration;
+      return {id:s.id,uid:s.uid,project:s.project,category:s.category,start:s.start instanceof Date?s.start.toISOString():s.start,duration:_liveDur,date:s.date,type:s.type||'tracked',manual:s.manual||false,screenshots:ss2,url:s.url||null};
     });
     var others=existing.filter(function(s){return s.uid!==cu.id;});
     var existingMine=existing.filter(function(s){return s.uid===cu.id;});
@@ -1670,8 +1671,8 @@ function syncSessionsToGitHub(){
       var _k=s.uid+'_'+s.id;
       if(_seenKeys[_k]) return false;
       _seenKeys[_k]=true;
-      // Auto-clean: skip zero-duration and artifact sessions >16h (57600s)
-      if(s.duration===0 || s.duration>57600) return false;
+      // Auto-clean: skip zero-duration ENDED sessions and artifact sessions >16h (57600s). Keep active sessions (no end).
+      if((s.duration===0 && s.end) || s.duration>57600) return false;
       return true;
     });
     var encoded=btoa(unescape(encodeURIComponent(JSON.stringify(merged,null,2))));
