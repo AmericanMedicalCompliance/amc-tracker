@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: AmericanMedicalCompliance/AMC-Table
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: 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
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
