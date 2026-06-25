@@ -1,0 +1,28 @@
+name: Create Cloudflare Token for AMC-Table
+on:
+  workflow_dispatch:
+  jobs:
+    create-token:
+        runs-on: ubuntu-latest
+            steps:
+                  - name: Create new Cloudflare API token
+                          run: |
+                                    RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/user/tokens" \
+                                                -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+                                                            -H "Content-Type: application/json" \
+                                                                        --data '{
+                                                                                      "name": "AMC-Table-Deploy-2026",
+                                                                                                    "policies": [{
+                                                                                                                    "effect": "allow",
+                                                                                                                                    "resources": {
+                                                                                                                                                      "com.cloudflare.api.account.9ed697b848e3ee14c4a6da7a20264748": "*"
+                                                                                                                                                                      },
+                                                                                                                                                                                      "permission_groups": [{
+                                                                                                                                                                                                        "id": "8d28297797f24fb8a0c332fe0866ec89",
+                                                                                                                                                                                                                          "name": "Pages Write"
+                                                                                                                                                                                                                                          }]
+                                                                                                                                                                                                                                                        }]
+                                                                                                                                                                                                                                                                    }')
+                                                                                                                                                                                                                                                                              echo "API Response: $RESPONSE"
+                                                                                                                                                                                                                                                                                        NEW_TOKEN=$(echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['result']['value'])" 2>/dev/null || echo "PARSE_ERROR")
+                                                                                                                                                                                                                                                                                                  echo "::notice::NEW_CLOUDFLARE_TOKEN=$NEW_TOKEN"
