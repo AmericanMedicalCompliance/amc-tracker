@@ -3889,9 +3889,16 @@ function setStoredPassword(email, pwd) {
 }
 function checkStoredPassword(email, pwd) {
   var stored = getStoredPassword(email);
-  return !!stored && stored === _amcHashPwd(pwd);
+  var hashed = _amcHashPwd(pwd);
+  if (stored && stored === hashed) return true;
+  // Fallback: check plain-text password stored in users array
+  var u = users.find(function(x){return x.email===email;});
+  if (u && u.password && pwd === u.password) {
+    setStoredPassword(email, pwd);
+    return true;
+  }
+  return false;
 }
-
 function completeSetup() {
   if (!_pendingLoginUser) return;
   var pwd = (document.getElementById('newPwd') || {}).value || '';
