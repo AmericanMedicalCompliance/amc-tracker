@@ -242,7 +242,7 @@
         <rect x="16" y="8" width="12" height="28" rx="2" fill="#5a9bbf"/>
         <rect x="8" y="16" width="28" height="12" rx="2" fill="#5a9bbf"/>
       </svg>
-      <div style="font-size:22px;font-weight:700;color:#4a86a8;">AMC Time Tracker</div>
+      <div style="font-size:22px;font-weight:700;color:#4a86a8;">AMC Tables</div>
       <div style="font-size:13px;color:#888;margin-top:4px;">American Medical Compliance</div>
     </div>
     
@@ -781,7 +781,7 @@
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       n8n Workflow Automation
     </div>
-    <p style="color:var(--text-muted);margin-bottom:16px;font-size:14px">Connect AMC Tracker to n8n to automate workflows â trigger payroll exports, send notifications, sync data with other tools, and more.</p>
+    <p style="color:var(--text-muted);margin-bottom:16px;font-size:14px">Connect AMC Tables to n8n to automate workflows â trigger payroll exports, send notifications, sync data with other tools, and more.</p>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
       <div style="flex:1;min-width:200px">
         <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">n8n Webhook URL</label>
@@ -1117,7 +1117,7 @@ async function syncUsersToGitHub() {
     const currentSha = fileData.sha;
     // Build safe user list (strip pwh/password)
     const safeUsers = usersToSync.map(u => ({ id:u.id, name:u.name, email:u.email, role:u.role||'employee', dept:u.dept, shift:u.shift, jobTitle:u.jobTitle||'', phone:u.phone||'', status:u.status||'active', startDate:u.startDate||'', invited:u.invited||false, manager:u.manager||null, leaveBalance:u.leaveBalance||{vacation:6,sick:4,personal:2}, needsSetup:u.needsSetup!==false, color:u.color||0, pin:u.pin||'0000' }));
-    const newJson = JSON.stringify({ users: safeUsers, updated: new Date().toISOString(), note: 'AMC Time Tracker user database. Managed automatically by the app.' }, null, 2);
+    const newJson = JSON.stringify({ users: safeUsers, updated: new Date().toISOString(), note: 'AMC Tables user database. Managed automatically by the app.' }, null, 2);
     const b64 = btoa(unescape(encodeURIComponent(newJson)));
     const putResp = await fetch(ghBase, { method: 'PUT', headers: ghHeaders, body: JSON.stringify({ message: 'Sync users from AMC Tracker [skip ci]', content: b64, sha: currentSha, branch: 'main' }) });
     if (putResp.ok) {
@@ -1205,7 +1205,7 @@ let approvals = [
   {id:2,uid:4,type:'Overtime',detail:'3h overtime on 2025-05-20     billing deadline',status:'pending',submitted:todayStr()},
 ];
 let auditLog = [
-  {id:1,uid:1,action:'System initialized',category:'System',detail:'AMC Time Tracker deployed',ts:new Date()},
+  {id:1,uid:1,action:'System initialized',category:'System',detail:'AMC Tables deployed',ts:new Date()},
 ];
 
 let nuid=6,nsid=1,nlid=1,nhid=14,napid=3,naudid=2;
@@ -2515,7 +2515,7 @@ async function bwSendReport(sch, silent){
     var subj = "AMC Work Hours Report (" + data.startMon + " to " + data.lastDay + ")";
     var okAll = true;
     for(var ri=0; ri<recips.length; ri++){
-      try{ await window.emailjs.send(window._ejsService, window._ejsTemplate, {to_email:recips[ri], otp_code:body, message:body, subject:subj, app_name:"AMC Time Tracker"}, {publicKey:window._ejsKey}); }
+      try{ await window.emailjs.send(window._ejsService, window._ejsTemplate, {to_email:recips[ri], otp_code:body, message:body, subject:subj, app_name:"AMC Tables"}, {publicKey:window._ejsKey}); }
       catch(e){ okAll=false; console.error("Report email failed:", e); }
     }
     if(!okAll){ if(!silent) alert("One or more report emails failed to send."); return false; }
@@ -2537,7 +2537,7 @@ async function checkReportSchedule(){
 function exportCSV(){
   if(!window._rptData){alert('Run a report first.');return;}
   const {rows,from,to}=window._rptData;
-  let csv=`AMC Time Tracker Report\nFrom,${from}\nTo,${to}\n\nEmployee,Present Days,Absent Days,Leave Days,Total Hours,Avg Hours/Day,Attendance %\n`;
+  let csv=`AMC Tables Report\nFrom,${from}\nTo,${to}\n\nEmployee,Present Days,Absent Days,Leave Days,Total Hours,Avg Hours/Day,Attendance %\n`;
   rows.forEach(({u,pd,ad,ld,totalSec,avgSec,pct})=>{ csv+=`"${u.name}",${pd},${ad},${ld},${(totalSec/3600).toFixed(1)},${(avgSec/3600).toFixed(1)},${pct}%\n`; });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`amc-report-${from}-to-${to}.csv`; a.click();
 }
@@ -2874,8 +2874,8 @@ function renderUsers(){
 
 function sendInvite(uid){
   const u=users.find(x=>x.id===uid); if(!u)return;
-  const sub=encodeURIComponent('You are invited to install AMC Time Tracker');
-  const body=encodeURIComponent(`Hi ${u.name},\n\nYou have been added to the AMC Time Tracker as a remote team member.\n\nAccess the tracker here:\n${window.location.href}\n\nYour login credentials:\n  Email: ${u.email}\n  A verification code will be sent to your email on first sign-in.\n\nAmerican Medical Compliance        HR`);
+  const sub=encodeURIComponent('You are invited to install AMC Tables');
+  const body=encodeURIComponent(`Hi ${u.name},\n\nYou have been added to the AMC Tables as a remote team member.\n\nAccess the tracker here:\n${window.location.href}\n\nYour login credentials:\n  Email: ${u.email}\n  A verification code will be sent to your email on first sign-in.\n\nAmerican Medical Compliance        HR`);
   window.open(`mailto:${u.email}?subject=${sub}&body=${body}`);
   u.invited=true; addAudit(cu.id,'Invite sent','User',`Invite sent to ${u.email}`); renderUsers();
 }
@@ -3334,12 +3334,12 @@ function runAlerts(){
 }
 
 async function saveWH(){ const v=document.getElementById('whUrl').value.trim(); if(!v){alert('Enter URL.');return;} webhookUrl=v; const sp=document.getElementById('whSt'); sp.className='badge badge-teal'; sp.textContent='Saved'; addAudit(cu.id,'Webhook saved','System','n8n webhook configured'); }
-async function testWH(){ if(!webhookUrl){alert('Save URL first.');return;} const sp=document.getElementById('whSt'); sp.className='badge badge-amber'; sp.textContent='Pinging...'; try{ await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'ping',source:'AMC Time Tracker',ts:new Date().toISOString()})}); sp.className='badge badge-teal'; sp.textContent='Ping OK'; }catch(e){ sp.className='badge badge-red'; sp.textContent='Failed'; } }
-async function pushAlerts(){ if(!webhookUrl){alert('Save webhook URL first.');return;} if(!activeAlerts.length){document.getElementById('pushSt').textContent='No alerts to push.';return;} document.getElementById('pushSt').textContent='Sending...'; try{ await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source:'AMC Time Tracker',timestamp:new Date().toISOString(),alert_count:activeAlerts.length,alerts:activeAlerts.map(a=>({user:a.name,type:a.type,severity:a.sev,message:a.msg,ts:new Date().toISOString()}))})}); document.getElementById('pushSt').textContent=activeAlerts.length+' alerts pushed'; addAudit(cu.id,'Alerts pushed','System',activeAlerts.length+' HR alerts sent to n8n'); }catch(e){ document.getElementById('pushSt').textContent='Push failed        check URL'; } }
+async function testWH(){ if(!webhookUrl){alert('Save URL first.');return;} const sp=document.getElementById('whSt'); sp.className='badge badge-amber'; sp.textContent='Pinging...'; try{ await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'ping',source:'AMC Tables',ts:new Date().toISOString()})}); sp.className='badge badge-teal'; sp.textContent='Ping OK'; }catch(e){ sp.className='badge badge-red'; sp.textContent='Failed'; } }
+async function pushAlerts(){ if(!webhookUrl){alert('Save webhook URL first.');return;} if(!activeAlerts.length){document.getElementById('pushSt').textContent='No alerts to push.';return;} document.getElementById('pushSt').textContent='Sending...'; try{ await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source:'AMC Tables',timestamp:new Date().toISOString(),alert_count:activeAlerts.length,alerts:activeAlerts.map(a=>({user:a.name,type:a.type,severity:a.sev,message:a.msg,ts:new Date().toISOString()}))})}); document.getElementById('pushSt').textContent=activeAlerts.length+' alerts pushed'; addAudit(cu.id,'Alerts pushed','System',activeAlerts.length+' HR alerts sent to n8n'); }catch(e){ document.getElementById('pushSt').textContent='Push failed        check URL'; } }
 var teamsWebhookUrl = '';
 async function saveTeams(){ var v = document.getElementById('teamsUrl').value.trim(); if(!v){ alert('Enter the Microsoft Teams webhook URL.'); return; } teamsWebhookUrl = v; var sp = document.getElementById('teamsSt'); sp.className = 'badge badge-teal'; sp.textContent = 'Saved'; try { addAudit(cu.id, 'Teams webhook saved', 'System', 'Microsoft Teams webhook configured'); } catch(e){} }
-async function testTeams(){ if(!teamsWebhookUrl){ alert('Save the Teams webhook URL first.'); return; } var sp = document.getElementById('teamsSt'); sp.className = 'badge badge-amber'; sp.textContent = 'Pinging...'; var card = { '@type':'MessageCard', '@context':'http://schema.org/extensions', themeColor:'4a86a8', summary:'AMC Time Tracker test', title:'AMC Time Tracker - test ping', text:'This is a test message from the AMC Time Tracker HR alerts integration.' }; try { await fetch(teamsWebhookUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(card)}); sp.className='badge badge-teal'; sp.textContent='Connected'; } catch(e){ sp.className='badge badge-red'; sp.textContent='Failed - check URL'; } }
-async function sendAlertsToTeams(){ if(!teamsWebhookUrl){ alert('Save the Teams webhook URL first.'); return; } if(!activeAlerts.length){ document.getElementById('pushSt').textContent='No alerts to send.'; return; } document.getElementById('pushSt').textContent='Sending to Teams...'; var facts = activeAlerts.map(function(a){ return { name: a.name + ' (' + a.type.replace(/_/g,' ') + ')', value: a.msg }; }); var card = { '@type':'MessageCard', '@context':'http://schema.org/extensions', themeColor:'e74c3c', summary:'AMC HR Alerts (' + activeAlerts.length + ')', title:'AMC Time Tracker - HR Alerts (' + activeAlerts.length + ')', sections:[ { activitySubtitle: new Date().toLocaleString(), facts: facts } ] }; try { await fetch(teamsWebhookUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(card)}); document.getElementById('pushSt').textContent = activeAlerts.length + ' alerts sent to Teams'; try { addAudit(cu.id, 'Alerts sent to Teams', 'System', activeAlerts.length + ' HR alerts sent to Microsoft Teams'); } catch(e){} } catch(e){ document.getElementById('pushSt').textContent='Teams send failed - check URL'; } }
+async function testTeams(){ if(!teamsWebhookUrl){ alert('Save the Teams webhook URL first.'); return; } var sp = document.getElementById('teamsSt'); sp.className = 'badge badge-amber'; sp.textContent = 'Pinging...'; var card = { '@type':'MessageCard', '@context':'http://schema.org/extensions', themeColor:'4a86a8', summary:'AMC Tables test', title:'AMC Tables - test ping', text:'This is a test message from the AMC Tables HR alerts integration.' }; try { await fetch(teamsWebhookUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(card)}); sp.className='badge badge-teal'; sp.textContent='Connected'; } catch(e){ sp.className='badge badge-red'; sp.textContent='Failed - check URL'; } }
+async function sendAlertsToTeams(){ if(!teamsWebhookUrl){ alert('Save the Teams webhook URL first.'); return; } if(!activeAlerts.length){ document.getElementById('pushSt').textContent='No alerts to send.'; return; } document.getElementById('pushSt').textContent='Sending to Teams...'; var facts = activeAlerts.map(function(a){ return { name: a.name + ' (' + a.type.replace(/_/g,' ') + ')', value: a.msg }; }); var card = { '@type':'MessageCard', '@context':'http://schema.org/extensions', themeColor:'e74c3c', summary:'AMC HR Alerts (' + activeAlerts.length + ')', title:'AMC Tables - HR Alerts (' + activeAlerts.length + ')', sections:[ { activitySubtitle: new Date().toLocaleString(), facts: facts } ] }; try { await fetch(teamsWebhookUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(card)}); document.getElementById('pushSt').textContent = activeAlerts.length + ' alerts sent to Teams'; try { addAudit(cu.id, 'Alerts sent to Teams', 'System', activeAlerts.length + ' HR alerts sent to Microsoft Teams'); } catch(e){} } catch(e){ document.getElementById('pushSt').textContent='Teams send failed - check URL'; } }
 window.saveTeams = saveTeams; window.testTeams = testTeams; window.sendAlertsToTeams = sendAlertsToTeams;
 
 //              AUDIT                                                                                                                                                                                                                                                                                                                                                                                                                               
@@ -3688,7 +3688,7 @@ function sendOTPEmail(email, otp) {      // Try Clerk email OTP first, fall back
     return window.emailjs.send(
       window._ejsService,
       window._ejsTemplate,
-      {to_email: email, otp_code: otp, app_name: 'AMC Time Tracker'},
+      {to_email: email, otp_code: otp, app_name: 'AMC Tables'},
       {publicKey: window._ejsKey}
     ).then(function() {
       console.log('OTP sent to ' + email);
