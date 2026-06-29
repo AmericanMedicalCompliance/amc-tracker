@@ -1243,6 +1243,7 @@ function dateRange(from,to){
   return res;
 }
 function mondayOf(d){ const dt=new Date(d); const day=dt.getDay()||7; dt.setDate(dt.getDate()-day+1); return dt.toISOString().slice(0,10); }
+function weekStartDate(){ const azToday=new Date().toLocaleDateString('en-CA',{timeZone:'America/Phoenix'}); const p=azToday.split('-'); const dt=new Date(+p[0],+p[1]-1,+p[2]); const day=dt.getDay()||7; dt.setDate(dt.getDate()-day+1); dt.setHours(0,0,0,0); return dt; }
 function addDays(d,n){ const dt=new Date(d); dt.setDate(dt.getDate()+n); return dt.toISOString().slice(0,10); }
 
 //              LOGIN                                                                                                                                                                                                                                                                                                                                                                                                                               
@@ -1723,7 +1724,7 @@ function syncSessionsToGitHub(){
 
 function updateMetrics(){
   if(!cu) return;
-  const td=todayStr(); const now=new Date(); const wa=new Date(now-7*24*3600*1000);
+  const td=todayStr(); const now=new Date(); const wa=weekStartDate();
   let ts=0,wk=0,cnt=0;
   sessions.filter(s=>s.uid===cu.id&&s.duration).forEach(s=>{ if(s.date===td){ts+=s.duration;cnt++;} if(new Date(s.start)>=wa) wk+=s.duration; });
   document.getElementById('m-today').textContent=fmtHM(ts);
@@ -1781,8 +1782,7 @@ function renderDashboard(){
   
   // Weekly stats
   const now = new Date();
-  const weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay());
-  weekStart.setHours(0,0,0,0);
+  const weekStart = weekStartDate();
   const weekSess = allSess.filter(s=>new Date(s.start)>=weekStart);
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthSess = allSess.filter(s=>new Date(s.start)>=monthStart);
@@ -1945,7 +1945,7 @@ function renderActivity(expandUid){
       const uSess = sessions.filter(function(s){return s.uid===u.id && s.duration;});
       const totalSecs = uSess.reduce(function(a,s){return a+(s.duration||0);},0);
       const todaySecs = uSess.filter(function(s){return s.date===todayStr2;}).reduce(function(a,s){return a+(s.duration||0);},0);
-      const weekSecs = uSess.filter(function(s){return new Date(s.start)>=(new Date(now-7*24*3600*1000));}).reduce(function(a,s){return a+(s.duration||0);},0);
+      const weekSecs = uSess.filter(function(s){return new Date(s.start)>=(weekStartDate());}).reduce(function(a,s){return a+(s.duration||0);},0);
         const monthStart2 = new Date(now.getFullYear(), now.getMonth(), 1);
         const monthSecs = uSess.filter(function(s){return new Date(s.start)>=monthStart2;}).reduce(function(a,s){return a+(s.duration||0);},0);
         const periodSecs = _actPer==='date' && window._actDate ? uSess.filter(function(s){return s.start&&s.start.substring(0,10)===window._actDate;}).reduce(function(a,s){return a+(s.duration||0);},0) : _actPer==='today' ? todaySecs : _actPer==='month' ? monthSecs : weekSecs;
@@ -2046,7 +2046,7 @@ function renderScreenshots() {
   var selDate = document.getElementById('ss-filter-date') ? document.getElementById('ss-filter-date').value : '';
   var now = new Date();
   var todayStr = now.toDateString();
-  var weekAgo = new Date(now - 7*24*3600*1000);
+  var weekAgo = weekStartDate();
   var monthAgo = new Date(now - 30*24*3600*1000);
   var allSS = [];
   allSess.forEach(function(s) {
@@ -2212,7 +2212,7 @@ function renderInsights(selectedUid){
   const insEl = document.getElementById('page-insights');
   var oldPanel = document.getElementById('adminInsightsPanel');
   if(oldPanel) oldPanel.remove();
-  const td=todayStr(); const now=new Date(); const wa=new Date(now-7*24*3600*1000);
+  const td=todayStr(); const now=new Date(); const wa=weekStartDate();
   if(isAdmin){
     var selectorHtml = '<div id="adminInsightsPanel" style="margin-bottom:16px">';
     selectorHtml += '<div class="card" style="margin-bottom:12px"><div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px">&#128202; All Team Overview  click a row for full insights</div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="border-bottom:2px solid var(--border)"><th style="padding:8px 10px;text-align:left;color:var(--text2);font-weight:500">User</th><th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500">Today</th><th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500">This Week</th><th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500">Sessions</th><th style="padding:8px 10px;text-align:right;color:var(--text2);font-weight:500">Top Project</th><th style="padding:8px 10px;text-align:center;color:var(--text2);font-weight:500">Detail</th></tr></thead><tbody>';
@@ -2858,7 +2858,7 @@ function renderUsers(){
   if (!cu) { cu = window._currentUser || users[0]; }
   if (!cu) return;
   const df=document.getElementById('uDeptF').value; const rf=document.getElementById('uRoleF').value;
-  const td=todayStr(); const now=new Date(); const wa=new Date(now-7*24*3600*1000);
+  const td=todayStr(); const now=new Date(); const wa=weekStartDate();
   const filtered=users.filter(u=>(!df||u.dept==df)&&(!rf||u.role===rf));
   const roleBadge={admin:'badge-purple',manager:'badge-blue',employee:'badge-teal'};
   const stBadge={active:'<span class="badge badge-teal">active</span>',on_leave:'<span class="badge badge-amber">on leave</span>',inactive:'<span class="badge badge-gray">inactive</span>'};
@@ -3274,7 +3274,7 @@ function renderLeavePolicy(){
 
 //              HR ALERTS                                                                                                                                                                                                                                                                                                                                                                                                       
 function calcAlerts(){
-  const now=new Date(); const td=todayStr(); const wa=new Date(now-7*24*3600*1000);
+  const now=new Date(); const td=todayStr(); const wa=weekStartDate();
   const md=+(document.getElementById('th-d')||{value:6}).value*3600;
   const mw=+(document.getElementById('th-w')||{value:30}).value*3600;
   const ms=+(document.getElementById('th-s')||{value:10}).value*60;
@@ -3420,7 +3420,7 @@ function openModal(mode,id){
     const u=users.find(x=>x.id===id); if(!u)return;
     const dept=departments.find(d=>d.id===u.dept); const shift=shifts.find(s=>s.id===u.shift); const mgr=users.find(x=>x.id===u.manager);
     const lb=u.leaveBalance||{}; const total=(lb.vacation||0)+(lb.sick||0)+(lb.personal||0);
-    const td=todayStr(); const now=new Date(); const wa=new Date(now-7*24*3600*1000);
+    const td=todayStr(); const now=new Date(); const wa=weekStartDate();
     let ts=0,wk=0; sessions.filter(s=>s.uid===u.id&&s.duration).forEach(s=>{ if(s.date===td)ts+=s.duration; if(new Date(s.start)>=wa)wk+=s.duration; });
     body=`<div style="text-align:center;margin-bottom:20px"><div class="av av-lg" style="${avStyle(u.color)};margin:0 auto 10px">${ini(u.name)}</div><div style="font-size:16px;font-weight:600">${u.name}</div><div style="font-size:13px;color:var(--text2);margin-top:2px">${u.jobTitle||''}</div></div>
     <table style="width:100%;font-size:13px">
