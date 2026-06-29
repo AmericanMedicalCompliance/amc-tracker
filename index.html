@@ -1214,7 +1214,13 @@ let mouseCount=0, keyCount=0;
 document.addEventListener('mousemove', function(){ mouseCount++; });
 document.addEventListener('keydown', function(){ keyCount++; });
 window.addEventListener('focus', function(){ mouseCount += 5; });
-document.addEventListener('visibilitychange', function(){ if(!document.hidden && running){ mouseCount += 10; } });
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden && running){ mouseCount += 10; }
+  // Auto-pause when device sleeps, screen locks, or tab is hidden
+  if(document.hidden && running && typeof stopTimer==='function'){
+    stopTimer();
+  }
+});
 document.addEventListener('click', function(){ mouseCount += 3; });
 document.addEventListener('scroll', function(){ mouseCount += 2; }, true);
 document.addEventListener('keypress', function(){ keyCount++; });
@@ -1478,7 +1484,7 @@ async function startTimer(){
   document.getElementById('statusDot').classList.add('live');
   document.getElementById('statusText').textContent = 'Tracking: '+proj;
   document.getElementById('permNotice').style.display='none';
-  tInt = setInterval(()=>{ secs=Math.round((Date.now()-_timerStartMs)/1000); document.getElementById('timerDisp').textContent=fmtS(secs); if(curSess) curSess.duration=secs; if(cu){try{localStorage.setItem('amc_active_timer',JSON.stringify({uid:cu.id,startEpoch:Date.now()-secs*1000,secs:secs,lastHeartbeat:Date.now(),project:curSess?curSess.project:'',category:curSess?curSess.category:''}));}catch(e){}} updateMetrics(); if(secs % 30 === 0) syncSessionsToGitHub(); },1000);
+  tInt = setInterval(()=>{ secs=Math.round((Date.now()-_timerStartMs)/1000); document.getElementById('timerDisp').textContent=fmtS(secs); if(curSess){curSess.duration=secs;curSess.lastHeartbeat=Date.now();} if(cu){try{localStorage.setItem('amc_active_timer',JSON.stringify({uid:cu.id,startEpoch:Date.now()-secs*1000,secs:secs,lastHeartbeat:Date.now(),project:curSess?curSess.project:'',category:curSess?curSess.category:''}));}catch(e){}} updateMetrics(); if(secs % 30 === 0) syncSessionsToGitHub(); },1000);
   if(!screenOk){
     // Show pre-prompt instruction overlay
     var _ssInstr = document.getElementById('ssInstructOverlay');
@@ -1577,7 +1583,7 @@ function saveSessions(){
     var toSave = sessions.filter(function(s){return s.uid===cu.id;}).map(function(s){
       // Include R2 screenshot URLs (skip base64 dataUrls to keep storage small)
       var ss=(s.screenshots||[]).filter(function(sc){return sc.url&&!sc.url.startsWith('data:');}).map(function(sc){return {url:sc.url,time:sc.time instanceof Date?sc.time.toISOString():sc.time,mouse:sc.mouse||0,keys:sc.keys||0};});
-      return {id:s.id,uid:s.uid,project:s.project,category:s.category,start:s.start instanceof Date?s.start.toISOString():s.start,duration:s.duration,date:s.date,type:s.type||'tracked',manual:s.manual||false,url:s.url||null,screenshots:ss};
+      return {id:s.id,uid:s.uid,project:s.project,category:s.category,start:s.start instanceof Date?s.start.toISOString():s.start,duration:s.duration,date:s.date,type:s.type||'tracked',manual:s.manual||false,url:s.url||null,screenshots:ss,lastHeartbeat:s.lastHeartbeat||null};
     });
     localStorage.setItem('amc_sessions_'+cu.id, JSON.stringify(toSave));
     if(nsid > 1) localStorage.setItem('amc_nsid', String(nsid));
@@ -1600,6 +1606,16 @@ function loadSessions(){
           s.screenshots = s.screenshots||[];
           if(s.start && typeof s.start === 'string') s.start = new Date(s.start);
           sessions.push(s);
+        }
+      });
+      // Sanitize sessions: cap duration if device shutdown left session running (heartbeat gap > 2min)
+      sessions.forEach(function(s){
+        if(!s.lastHeartbeat || !s.start) return;
+        var startMs = s.start instanceof Date ? s.start.getTime() : new Date(s.start).getTime();
+        var maxAllowed = Math.floor((s.lastHeartbeat - startMs)/1000) + 120;
+        if(s.duration > maxAllowed && maxAllowed > 0){
+          console.log('[AMC] Capping inflated session', s.id, 'from', s.duration, 'to', maxAllowed);
+          s.duration = Math.max(0, maxAllowed);
         }
       });
       var maxId = allSaved.reduce(function(m,s){return Math.max(m,s.id);},0);
