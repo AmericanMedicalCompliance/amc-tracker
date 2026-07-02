@@ -15,4 +15,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: 9ed697b848e3ee14c4a6da7a20264748
-          command: pages deploy . --project-name=amc-table --branch=main
+          command: pages deploy . --project-name=amc-tracker --branch=main
