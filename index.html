@@ -228,7 +228,16 @@
         window.emailjs.init({publicKey: window._ejsKey});
       }
     });
-  </script></head>
+  </script>
+<!-- Clerk authentication -->
+<script
+  async
+  crossorigin="anonymous"
+  data-clerk-publishable-key="pk_live_Y2xlcmsudHJhY2tlci5hbWNsbXMuY29tJA"
+  src="https://clerk.tracker.amclms.com/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+  type="text/javascript"
+></script>
+</head>
 <body>
 
 <!-- LOGIN -->
@@ -245,76 +254,8 @@
       <div style="font-size:13px;color:#888;margin-top:4px;">American Medical Compliance</div>
     </div>
     
-    <!-- Step 1: Email + Password -->
-    <div id="loginStep1">
-      <div style="margin-bottom:16px;text-align:left;">
-        <label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:6px;">Email Address</label>
-        <input type="email" id="loginEmail" placeholder="your@email.com" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;box-sizing:border-box;outline:none;transition:border 0.2s;" onfocus="this.style.borderColor='#4a86a8'" onblur="this.style.borderColor='#e0e0e0'"/>
-      </div>
-      
-      <div style="margin-bottom:16px;text-align:left;"><label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:6px;">Password</label><input type="password" id="loginPwd1" placeholder="Enter your password" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;box-sizing:border-box;outline:none;transition:border 0.2s;" onfocus="this.style.borderColor='#4a86a8'" onblur="this.style.borderColor='#e0e0e0'" onkeydown="if(event.key==='Enter'){doEmailLogin();}"/></div>
-      <div id="loginError" style="color:#e74c3c;font-size:13px;margin-bottom:12px;display:none;"></div>
-      <button id="loginContinueBtn" onclick="doEmailLogin()" style="width:100%;background:#4a86a8;color:white;border:none;padding:14px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">Sign In</button>
-      <div style="text-align:center;margin-top:10px;"><a href="#" onclick="useCodeFromStart();return false;" style="font-size:13px;color:#4a86a8;text-decoration:none;">First time here? Email me a code instead</a></div>
-    </div>
-    
-        <!-- Microsoft Sign-In -->
-    <div id="loginStep1MS" style="margin-top:12px;">
-      <div style="display:flex;align-items:center;gap:10px;margin:16px 0 12px;">
-        <div style="flex:1;height:1px;background:#e0e0e0;"></div>
-        <span style="font-size:12px;color:#999;white-space:nowrap;">or sign in with</span>
-        <div style="flex:1;height:1px;background:#e0e0e0;"></div>
-      </div>
-      <button onclick="connectMS365()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1.5px solid #d0d0d0;border-radius:8px;padding:12px;font-size:15px;font-weight:600;color:#333;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='#fff'">
-        <svg width="20" height="20" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="9" height="9" fill="#F25022"/><rect x="11" y="1" width="9" height="9" fill="#7FBA00"/><rect x="1" y="11" width="9" height="9" fill="#00A4EF"/><rect x="11" y="11" width="9" height="9" fill="#FFB900"/></svg>
-        Sign in with Microsoft
-      </button>
-    </div>
-    
-    <!-- Step 2: OTP Verification -->
-    <div id="loginStep2" style="display:none;">
-      <div style="background:#e8f1f7;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:#2d6080;">
-        &#128140; A verification code has been sent to <strong id="otpEmailDisplay"></strong>
-      </div>
-      <div id="otpInputGroup" style="display:block;margin-bottom:16px;text-align:left;">
-        <label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:6px;">Verification Code</label>
-        <input type="text" id="otpInput" maxlength="6" placeholder="000000" style="width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:8px;font-size:22px;letter-spacing:8px;text-align:center;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='#4a86a8'" onblur="this.style.borderColor='#e0e0e0'" oninput="this.value=this.value.replace(/[^0-9]/g,'')" onkeydown="if(event.key==='Enter')verifyOtp()"/>
-      </div>
-      <p id="otpTimer" style="font-size:13px;color:#888;margin-bottom:12px;"></p>
-      <div id="otpError" style="color:#e74c3c;font-size:13px;margin-bottom:12px;display:none;"></div>
-      <button onclick="verifyOtp()" style="width:100%;background:#4a86a8;color:white;border:none;padding:14px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-bottom:10px;">Verify Code</button>
-      <button onclick="resendOtp()" style="width:100%;background:none;border:2px solid #4a86a8;color:#4a86a8;padding:12px;border-radius:8px;font-size:14px;cursor:pointer;">Resend Code</button>
-    </div>
-    
-    <!-- Step 1b: Password sign-in (returning users) -->
-<div id="loginStepPwd" style="display:none;">
-<div style="background:#e8f1f7;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:#2d6080;text-align:left;">Signing in as <strong id="pwdEmailDisplay"></strong></div>
-<div style="margin-bottom:16px;text-align:left;">
-<label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:6px;">Password</label>
-<input type="password" id="signinPwd" placeholder="Enter your password" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='#4a86a8'" onblur="this.style.borderColor='#e0e0e0'" onkeydown="if(event.key==='Enter')doPasswordLogin()"/>
-</div>
-<div id="signinError" style="color:#e74c3c;font-size:13px;margin-bottom:12px;display:none;"></div>
-<button onclick="doPasswordLogin()" style="width:100%;background:#4a86a8;color:white;border:none;padding:14px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-bottom:10px;">Sign In</button>
-<button onclick="useEmailCodeInstead()" style="width:100%;background:none;border:2px solid #4a86a8;color:#4a86a8;padding:12px;border-radius:8px;font-size:14px;cursor:pointer;">Forgot password? Sign in with email code</button>
-</div>
-
-<!-- Step 3: First-time password setup -->
-    <div id="loginStep3" style="display:none;">
-      <p style="color:#444;font-size:14px;margin-bottom:20px;text-align:center;font-weight:500;">&#128075; Welcome! Create a password to access your account.<br><small style="color:#888;">Must be at least 6 characters with 1 uppercase, 1 lowercase, and 1 symbol.</small></p>
-      <div style="margin-bottom:12px;text-align:left;">
-        <label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:6px;">New Password</label>
-        <input type="password" id="newPwd" placeholder="At least 6 chars, 1 upper, 1 lower, 1 symbol" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:14px;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='#4a86a8'" onblur="this.style.borderColor='#e0e0e0'"/>
-      </div>
-      <div style="margin-bottom:16px;text-align:left;">
-        <label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:6px;">Confirm Password</label>
-        <input type="password" id="confirmPwd" placeholder="Repeat your password" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:14px;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='#4a86a8'" onblur="this.style.borderColor='#e0e0e0'"/>
-      </div>
-      <div style="text-align:left;font-size:12px;color:#888;margin-bottom:16px;">
-        &#10003; Min 6 characters &nbsp; &#10003; 1 uppercase &nbsp; &#10003; 1 lowercase &nbsp; &#10003; 1 symbol
-      </div>
-      <div id="setupError" style="color:#e74c3c;font-size:13px;margin-bottom:12px;display:none;"></div>
-      <button onclick="completeSetup()" style="width:100%;background:#4a86a8;color:white;border:none;padding:14px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">Set Password & Login</button>
-    </div>
+    <div id="clerk-auth-mount"></div>
+<div id="clerkAuthError" style="color:#e74c3c;font-size:13px;margin-top:12px;display:none;"></div>
   </div>
 </div>
 
@@ -4096,27 +4037,14 @@ function doLogout() {
   var ms365Panel = document.getElementById('ms365Panel');
   if (ms365Panel) ms365Panel.style.display = 'none';
   
-  // Show our new login screen
+  // Show our new login screen (Clerk-managed)
   var ls = document.getElementById('loginScreen');
-  if (ls) {
-    ls.style.display = 'flex';
-    // Reset to step 1
-    var s1 = document.getElementById('loginStep1');
-    var s2 = document.getElementById('loginStep2');
-    var s3 = document.getElementById('loginStep3');
-    if (s1) s1.style.display = 'block';
-    if (s2) s2.style.display = 'none';
-    if (s3) s3.style.display = 'none';
-    // Clear inputs
-    var emailEl = document.getElementById('loginEmail');
-    var pwdEl = document.getElementById('loginPassword');
-    var errEl = document.getElementById('loginError');
-    var continueBtn = document.getElementById('loginContinueBtn');
-    if (emailEl) emailEl.value = '';
-    if (pwdEl) pwdEl.value = '';
-    if (errEl) { errEl.textContent = ''; errEl.style.display = 'none'; }
-    var pwdGroup = document.getElementById('pwdGroup'); if (pwdGroup) pwdGroup.style.display = 'none';
-    if (continueBtn) continueBtn.textContent = 'Continue';
+  if (ls) { ls.style.display = 'flex'; }
+  if (window.Clerk && Clerk.signOut) {
+    Clerk.signOut().then(function(){
+      var mount = document.getElementById('clerk-auth-mount');
+      if (mount) { mount.innerHTML=''; Clerk.mountSignIn(mount); }
+    });
   }
 }
 
@@ -4513,6 +4441,35 @@ function emailPayroll(){
   if(window.emailjs&&window._ejsService&&window._ejsTemplate){window.emailjs.send(window._ejsService,window._ejsTemplate,{subject:sub,message:bod}).then(function(){alert('Payroll emailed successfully!');}).catch(function(e){alert('Email failed: '+(e&&e.text?e.text:e));});}
   else{window.location.href='mailto:?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(bod);}
 }
+</script>
+<script>
+async function amcMatchClerkUserAndLogin(clerkUser) {
+  var email = ((clerkUser.primaryEmailAddress && clerkUser.primaryEmailAddress.emailAddress) || '').toLowerCase();
+  var match = (users || []).find(function(u){ return (u.email||'').toLowerCase() === email; });
+  var errEl = document.getElementById('clerkAuthError');
+  if (!match) {
+    if (errEl) { errEl.textContent = 'No AMC Tracker account found for ' + email + '. Contact your admin to be added.'; errEl.style.display = 'block'; }
+    return;
+  }
+  if (errEl) errEl.style.display = 'none';
+  completeLogin(match);
+}
+window.addEventListener('load', async function () {
+  try {
+    await Clerk.load();
+    if (Clerk.user) {
+      amcMatchClerkUserAndLogin(Clerk.user);
+    } else {
+      var mount = document.getElementById('clerk-auth-mount');
+      if (mount) Clerk.mountSignIn(mount);
+    }
+    Clerk.addListener(function (payload) {
+      if (payload.user) amcMatchClerkUserAndLogin(payload.user);
+    });
+  } catch (e) {
+    console.error('Clerk init failed', e);
+  }
+});
 </script>
 </body>
 </html>
