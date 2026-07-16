@@ -4467,7 +4467,7 @@ window.addEventListener('load', async function () {
       amcMatchClerkUserAndLogin(Clerk.user);
     } else {
       var mount = document.getElementById('clerk-auth-mount');
-      if (mount) Clerk.mountSignIn(mount);
+      if (mount) { var __p = new URLSearchParams(window.location.search); if (__p.has('__clerk_ticket')) { Clerk.mountSignUp(mount); } else { Clerk.mountSignIn(mount); } }
     }
     Clerk.addListener(function (payload) {
       if (payload.user) amcMatchClerkUserAndLogin(payload.user);
