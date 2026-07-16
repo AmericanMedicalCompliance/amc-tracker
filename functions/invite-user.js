@@ -8,117 +8,142 @@
 export async function onRequestPost(context) {
     const { request, env } = context;
 
-  const corsHeaders = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-  };
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+};
 
-  try {
-        const body = await request.json();
-        const email = (body.email || '').trim().toLowerCase();
-        const name = (body.name || '').trim();
+try {
+    const body = await request.json();
+    const email = (body.email || '').trim().toLowerCase();
+    const name = (body.name || '').trim();
 
-      if (!email) {
-              return new Response(JSON.stringify({ error: 'Email is required' }), {
-                        status: 400,
-                        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-              });
-      }
-
-      const secretKey = env.CLERK_SECRET_KEY;
-        if (!secretKey) {
-                return new Response(JSON.stringify({ error: 'CLERK_SECRET_KEY not configured' }), {
-                          status: 500,
-                          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-                });
-        }
-
-      const resp = await fetch('https://api.clerk.com/v1/invitations', {
-              method: 'POST',
-              headers: {
-                        Authorization: 'Bearer ' + secretKey,
-                        'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                        email_address: email,
-                        redirect_url: 'https://tracker.amclms.com/',
-                        notify: false,
-                        ignore_existing: true,
-                        public_metadata: name ? { name: name } : undefined,
-              }),
-      });
-
-      const data = await resp.json();
-
-      if (!resp.ok) {
-              const msg = (data.errors && data.errors[0] && data.errors[0].message) || 'Clerk invitation failed';
-              return new Response(JSON.stringify({ error: msg, details: data }), {
-                        status: resp.status,
-                        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-              });
-      }
-
-      const inviteLink = data.url
-          || (data.ticket ? ('https://accounts.tracker.amclms.com/sign-up?__clerk_ticket=' + data.ticket) : 'https://tracker.amclms.com/');
-
-      let emailSent = false;
-        let emailError = null;
-        const ejsServiceId = env.EMAILJS_SERVICE_ID;
-        const ejsTemplateId = env.EMAILJS_TEMPLATE_ID;
-        const ejsPublicKey = env.EMAILJS_PUBLIC_KEY;
-        const ejsPrivateKey = env.EMAILJS_PRIVATE_KEY;
-
-      if (ejsServiceId && ejsTemplateId && ejsPublicKey && ejsPrivateKey) {
-              try {
-                        const ejsResp = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                                  service_id: ejsServiceId,
-                                                  template_id: ejsTemplateId,
-                                                  user_id: ejsPublicKey,
-                                                  accessToken: ejsPrivateKey,
-                                                  template_params: {
-                                                                  to_email: email,
-                                                                  to_name: name || email,
-                                                                  invite_link: inviteLink,
-                                                  },
-                                    }),
-                        });
-                        emailSent = ejsResp.ok;
-                        if (!ejsResp.ok) emailError = await ejsResp.text();
-              } catch (e) {
-                        emailError = e.message;
-              }
-      } else {
-              emailError = 'EmailJS environment variables not configured';
-      }
-
-      return new Response(JSON.stringify({
-              ok: true,
-              invitation: { id: data.id, status: data.status, email_address: data.email_address },
-              emailSent,
-              emailError,
-      }), {
-              status: 200,
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-  } catch (err) {
-        return new Response(JSON.stringify({ error: err.message }), {
-                status: 500,
-                headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+    if (!email) {
+        return new Response(JSON.stringify({ error: 'Email is required' }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
-  }
+    }
+
+    const secretKey = env.CLERK_SECRET_KEY;
+    if (!secretKey) {
+        return new Response(JSON.stringify({ error: 'CLERK_SECRET_KEY not configured' }), {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+    }
+
+    // Revoke any existing pending invitations for this email first. Otherwise every
+    // Resend click created a brand new invitation/ticket while the previous one was
+    // left dangling, so a link from an earlier email would suddenly break with
+    // "This invitation refers to a non-existing identification." Keeping only one
+    // active invitation per email means the latest email sent is always the one
+    // that actually works.
+    try {
+        const listResp = await fetch('https://api.clerk.com/v1/invitations?status=pending&limit=100', {
+            headers: { Authorization: 'Bearer ' + secretKey },
+        });
+        if (listResp.ok) {
+            const listData = await listResp.json();
+            const items = Array.isArray(listData) ? listData : (listData.data || []);
+            const stale = items.filter((inv) => (inv.email_address || '').toLowerCase() === email);
+            for (const inv of stale) {
+                await fetch('https://api.clerk.com/v1/invitations/' + inv.id + '/revoke', {
+                    method: 'POST',
+                    headers: { Authorization: 'Bearer ' + secretKey, 'Content-Type': 'application/json' },
+                });
+            }
+        }
+    } catch (e) {
+        // Non-fatal: if this cleanup check fails, still proceed to create a new invitation
+    }
+
+    const resp = await fetch('https://api.clerk.com/v1/invitations', {
+        method: 'POST',
+        headers: {
+            Authorization: 'Bearer ' + secretKey,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email_address: email,
+            redirect_url: 'https://tracker.amclms.com/',
+            notify: false,
+            ignore_existing: true,
+            public_metadata: name ? { name: name } : undefined,
+        }),
+    });
+
+    const data = await resp.json();
+
+    if (!resp.ok) {
+        const msg = (data.errors && data.errors[0] && data.errors[0].message) || 'Clerk invitation failed';
+        return new Response(JSON.stringify({ error: msg, details: data }), {
+            status: resp.status,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+    }
+
+    const inviteLink = data.url
+    || (data.ticket ? ('https://accounts.tracker.amclms.com/sign-up?__clerk_ticket=' + data.ticket) : 'https://tracker.amclms.com/');
+
+    let emailSent = false;
+    let emailError = null;
+    const ejsServiceId = env.EMAILJS_SERVICE_ID;
+    const ejsTemplateId = env.EMAILJS_TEMPLATE_ID;
+    const ejsPublicKey = env.EMAILJS_PUBLIC_KEY;
+    const ejsPrivateKey = env.EMAILJS_PRIVATE_KEY;
+
+    if (ejsServiceId && ejsTemplateId && ejsPublicKey && ejsPrivateKey) {
+        try {
+            const ejsResp = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    service_id: ejsServiceId,
+                    template_id: ejsTemplateId,
+                    user_id: ejsPublicKey,
+                    accessToken: ejsPrivateKey,
+                    template_params: {
+                        to_email: email,
+                        to_name: name || email,
+                        invite_link: inviteLink,
+                    },
+                }),
+            });
+            emailSent = ejsResp.ok;
+            if (!ejsResp.ok) emailError = await ejsResp.text();
+        } catch (e) {
+            emailError = e.message;
+        }
+    } else {
+        emailError = 'EmailJS environment variables not configured';
+    }
+
+    return new Response(JSON.stringify({
+        ok: true,
+        invitation: { id: data.id, status: data.status, email_address: data.email_address },
+        emailSent,
+        emailError,
+    }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+} catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+        status: 500,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+    });
+}
 }
 
 export async function onRequestOptions() {
     return new Response(null, {
-          status: 204,
-          headers: {
-                  'Access-Control-Allow-Origin': '*',
-                  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                  'Access-Control-Allow-Headers': 'Content-Type',
-          },
+        status: 204,
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+        },
     });
 }
