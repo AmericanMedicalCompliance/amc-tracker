@@ -2813,7 +2813,7 @@ function renderUsers(){
 
 function sendInvite(uid){
 const u=users.find(x=>x.id===uid); if(!u)return;
-const row=document.querySelector('tr [onclick*="sendInvite("+uid+")"]');
+const row=document.querySelector('tr [onclick*="sendInvite('+uid+')"]');
 if(row){row.disabled=true;row.textContent='Sending...';}
 fetch('/invite-user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:u.email,name:u.name})})
 .then(function(r){return r.json().then(function(d){return {ok:r.ok,data:d};});})
