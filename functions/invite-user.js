@@ -2,8 +2,12 @@
 // Creates a real Clerk invitation for a given email using Clerk's Backend API,
 // then sends a custom-branded invite email via EmailJS (instead of Clerk's own
 // built-in email). Clerk stays silent (notify:false) so only our EmailJS email
-// goes out. All secret keys stay server-side only and are never sent to the browser.
+// goes out. Also invites the person to the shared Clerk Organization so they
+// land inside it automatically instead of hitting the "create your own org"
+// screen. All secret keys stay server-side only and are never sent to the browser.
 // Called by the AMC Time Tracker admin Users page (sendInvite()).
+
+const ORG_ID = 'org_3GavdZx5XcUuW5VOH0xiOO0wgbp';
 
 export async function onRequestPost(context) {
     const { request, env } = context;
@@ -34,12 +38,6 @@ try {
         });
     }
 
-    // Revoke any existing pending invitations for this email first. Otherwise every
-    // Resend click created a brand new invitation/ticket while the previous one was
-    // left dangling, so a link from an earlier email would suddenly break with
-    // "This invitation refers to a non-existing identification." Keeping only one
-    // active invitation per email means the latest email sent is always the one
-    // that actually works.
     try {
         const listResp = await fetch('https://api.clerk.com/v1/invitations?status=pending&limit=100', {
             headers: { Authorization: 'Bearer ' + secretKey },
@@ -56,7 +54,6 @@ try {
             }
         }
     } catch (e) {
-        // Non-fatal: if this cleanup check fails, still proceed to create a new invitation
     }
 
     const resp = await fetch('https://api.clerk.com/v1/invitations', {
@@ -86,6 +83,43 @@ try {
 
     const inviteLink = data.url
     || (data.ticket ? ('https://accounts.tracker.amclms.com/sign-up?__clerk_ticket=' + data.ticket) : 'https://tracker.amclms.com/');
+
+    let orgInvite = null;
+    try {
+        try {
+            const orgListResp = await fetch(
+                'https://api.clerk.com/v1/organizations/' + ORG_ID + '/invitations?status=pending&limit=100',
+                { headers: { Authorization: 'Bearer ' + secretKey } }
+                );
+            if (orgListResp.ok) {
+                const orgListData = await orgListResp.json();
+                const orgItems = Array.isArray(orgListData) ? orgListData : (orgListData.data || []);
+                const staleOrg = orgItems.filter((inv) => (inv.email_address || '').toLowerCase() === email);
+                for (const inv of staleOrg) {
+                    await fetch(
+                        'https://api.clerk.com/v1/organizations/' + ORG_ID + '/invitations/' + inv.id + '/revoke',
+                        { method: 'POST', headers: { Authorization: 'Bearer ' + secretKey, 'Content-Type': 'application/json' } }
+                        );
+                }
+            }
+        } catch (e) {
+        }
+
+    const orgResp = await fetch('https://api.clerk.com/v1/organizations/' + ORG_ID + '/invitations', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + secretKey, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email_address: email, role: 'org:member', notify: false }),
+    });
+        const orgData = await orgResp.json();
+        if (orgResp.ok) {
+            orgInvite = 'invited';
+        } else {
+            const orgMsg = (orgData.errors && orgData.errors[0] && orgData.errors[0].message) || 'org invite failed';
+            orgInvite = /already/i.test(orgMsg) ? 'already_member' : ('failed: ' + orgMsg);
+        }
+    } catch (e) {
+        orgInvite = 'failed: ' + e.message;
+    }
 
     let emailSent = false;
     let emailError = null;
@@ -123,6 +157,7 @@ try {
     return new Response(JSON.stringify({
         ok: true,
         invitation: { id: data.id, status: data.status, email_address: data.email_address },
+        orgInvite,
         emailSent,
         emailError,
     }), {
