@@ -9933,6 +9933,305 @@
     "url": null
   },
   {
+    "id": 97,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-05T15:16:42.546Z",
+    "duration": 36,
+    "date": "2026-06-05",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 98,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-05T15:17:25.992Z",
+    "duration": 11,
+    "date": "2026-06-05",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 99,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-05T15:17:38.027Z",
+    "duration": 6,
+    "date": "2026-06-05",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 101,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-05T15:29:13.505Z",
+    "duration": 1264,
+    "date": "2026-06-05",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 103,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-05T15:54:01.712Z",
+    "duration": 379,
+    "date": "2026-06-05",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 104,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-05T16:01:10.984Z",
+    "duration": 28,
+    "date": "2026-06-05",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 109,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-05T17:26:49.638Z",
+    "duration": 21,
+    "date": "2026-06-05",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 111,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-05T21:19:59.293Z",
+    "duration": 1174,
+    "date": "2026-06-05",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 112,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-05T21:39:34.815Z",
+    "duration": 8,
+    "date": "2026-06-05",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 206,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-17T23:20:34.108Z",
+    "duration": 12237,
+    "date": "2026-06-17",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 207,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-17T23:20:43.369Z",
+    "duration": 2,
+    "date": "2026-06-17",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 208,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-17T23:20:47.966Z",
+    "duration": 23,
+    "date": "2026-06-17",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 210,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-17T23:21:30.279Z",
+    "duration": 1507,
+    "date": "2026-06-17",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 211,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-18T11:19:10.968Z",
+    "duration": 15,
+    "date": "2026-06-18",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 214,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-18T11:19:42.514Z",
+    "duration": 13300,
+    "date": "2026-06-18",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 234,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-19T15:22:08.250Z",
+    "duration": 16,
+    "date": "2026-06-19",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 235,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-19T15:22:31.208Z",
+    "duration": 81,
+    "date": "2026-06-19",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 238,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-19T15:30:43.177Z",
+    "duration": 227,
+    "date": "2026-06-19",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 240,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-19T16:41:21.469Z",
+    "duration": 2132,
+    "date": "2026-06-19",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 256,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-06-22T16:41:42.041Z",
+    "duration": 3607,
+    "date": "2026-06-22",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 263,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-07-17T15:52:27.945Z",
+    "duration": 4484,
+    "date": "2026-07-17",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 266,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-07-17T16:00:58.237Z",
+    "duration": 5343,
+    "date": "2026-07-17",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 268,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-07-22T19:37:08.538Z",
+    "duration": 5354,
+    "date": "2026-07-22",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
     "id": 4,
     "uid": 5,
     "project": "Untitled",
@@ -11250,302 +11549,201 @@
     "url": null
   },
   {
-    "id": 97,
-    "uid": 1,
+    "id": 260,
+    "uid": 5,
     "project": "AMC Project",
     "category": "Work",
-    "start": "2026-06-05T15:16:42.546Z",
-    "duration": 36,
-    "date": "2026-06-05",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 98,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-05T15:17:25.992Z",
-    "duration": 11,
-    "date": "2026-06-05",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 99,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-05T15:17:38.027Z",
-    "duration": 6,
-    "date": "2026-06-05",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 101,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-05T15:29:13.505Z",
-    "duration": 1264,
-    "date": "2026-06-05",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 103,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-05T15:54:01.712Z",
-    "duration": 379,
-    "date": "2026-06-05",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 104,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-05T16:01:10.984Z",
-    "duration": 28,
-    "date": "2026-06-05",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 109,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-05T17:26:49.638Z",
-    "duration": 21,
-    "date": "2026-06-05",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 111,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-05T21:19:59.293Z",
-    "duration": 1174,
-    "date": "2026-06-05",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 112,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-05T21:39:34.815Z",
-    "duration": 8,
-    "date": "2026-06-05",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 206,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-17T23:20:34.108Z",
-    "duration": 12237,
-    "date": "2026-06-17",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 207,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-17T23:20:43.369Z",
-    "duration": 2,
-    "date": "2026-06-17",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 208,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-17T23:20:47.966Z",
-    "duration": 23,
-    "date": "2026-06-17",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 210,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-17T23:21:30.279Z",
-    "duration": 1507,
-    "date": "2026-06-17",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 211,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-18T11:19:10.968Z",
-    "duration": 15,
-    "date": "2026-06-18",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 214,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-18T11:19:42.514Z",
-    "duration": 13300,
-    "date": "2026-06-18",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 234,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-19T15:22:08.250Z",
-    "duration": 16,
-    "date": "2026-06-19",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 235,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-19T15:22:31.208Z",
-    "duration": 81,
-    "date": "2026-06-19",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 238,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-19T15:30:43.177Z",
-    "duration": 227,
-    "date": "2026-06-19",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 240,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-19T16:41:21.469Z",
-    "duration": 2132,
-    "date": "2026-06-19",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 256,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-06-22T16:41:42.041Z",
-    "duration": 3607,
-    "date": "2026-06-22",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 263,
-    "uid": 1,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-07-17T15:52:27.945Z",
-    "duration": 4484,
+    "start": "2026-07-17T16:46:35.002Z",
+    "duration": 12055,
     "date": "2026-07-17",
     "type": "tracked",
     "manual": false,
-    "screenshots": [],
+    "screenshots": [
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784306799061.jpg",
+        "time": "2026-07-17T16:46:39.061Z",
+        "mouse": 53,
+        "keys": 2
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784307699163.jpg",
+        "time": "2026-07-17T17:01:39.163Z",
+        "mouse": 252,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784308599151.jpg",
+        "time": "2026-07-17T17:16:39.151Z",
+        "mouse": 2334,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784309499147.jpg",
+        "time": "2026-07-17T17:31:39.147Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784310399153.jpg",
+        "time": "2026-07-17T17:46:39.153Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784311299193.jpg",
+        "time": "2026-07-17T18:01:39.193Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784312199264.jpg",
+        "time": "2026-07-17T18:16:39.264Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784313099141.jpg",
+        "time": "2026-07-17T18:31:39.141Z",
+        "mouse": 50,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784313999150.jpg",
+        "time": "2026-07-17T18:46:39.150Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784314899138.jpg",
+        "time": "2026-07-17T19:01:39.138Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784315799282.jpg",
+        "time": "2026-07-17T19:16:39.282Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784316699164.jpg",
+        "time": "2026-07-17T19:31:39.164Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784317599292.jpg",
+        "time": "2026-07-17T19:46:39.292Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/260_1784318499205.jpg",
+        "time": "2026-07-17T20:01:39.205Z",
+        "mouse": 1,
+        "keys": 0
+      }
+    ],
     "url": null
   },
   {
-    "id": 266,
-    "uid": 1,
+    "id": 262,
+    "uid": 5,
     "project": "AMC Project",
     "category": "Work",
-    "start": "2026-07-17T16:00:58.237Z",
-    "duration": 5343,
+    "start": "2026-07-17T20:10:11.331Z",
+    "duration": 1,
     "date": "2026-07-17",
     "type": "tracked",
     "manual": false,
-    "screenshots": [],
+    "screenshots": [
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/262_1784319011392.jpg",
+        "time": "2026-07-17T20:10:11.392Z",
+        "mouse": 96,
+        "keys": 0
+      }
+    ],
     "url": null
   },
   {
-    "id": 268,
-    "uid": 1,
+    "id": 264,
+    "uid": 5,
     "project": "AMC Project",
     "category": "Work",
-    "start": "2026-07-22T19:37:08.538Z",
-    "duration": 5354,
-    "date": "2026-07-22",
+    "start": "2026-07-17T21:32:20.720Z",
+    "duration": 9254,
+    "date": "2026-07-17",
     "type": "tracked",
     "manual": false,
-    "screenshots": [],
+    "screenshots": [
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/264_1784323940822.jpg",
+        "time": "2026-07-17T21:32:20.822Z",
+        "mouse": 166,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/264_1784324841166.jpg",
+        "time": "2026-07-17T21:47:21.166Z",
+        "mouse": 173,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/264_1784325741153.jpg",
+        "time": "2026-07-17T22:02:21.153Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/264_1784326641173.jpg",
+        "time": "2026-07-17T22:17:21.173Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/264_1784327541156.jpg",
+        "time": "2026-07-17T22:32:21.156Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/264_1784328441187.jpg",
+        "time": "2026-07-17T22:47:21.187Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/264_1784329341231.jpg",
+        "time": "2026-07-17T23:02:21.231Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/264_1784330241156.jpg",
+        "time": "2026-07-17T23:17:21.156Z",
+        "mouse": 100,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/264_1784331141177.jpg",
+        "time": "2026-07-17T23:32:21.177Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/264_1784332041147.jpg",
+        "time": "2026-07-17T23:47:21.147Z",
+        "mouse": 1,
+        "keys": 0
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/264_1784332941161.jpg",
+        "time": "2026-07-18T00:02:21.161Z",
+        "mouse": 1,
+        "keys": 0
+      }
+    ],
     "url": null
   }
 ]
