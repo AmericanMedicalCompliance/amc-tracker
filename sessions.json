@@ -11534,5 +11534,18 @@
     "manual": false,
     "screenshots": [],
     "url": null
+  },
+  {
+    "id": 268,
+    "uid": 1,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-07-22T19:37:08.538Z",
+    "duration": 5344,
+    "date": "2026-07-22",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
   }
 ]
