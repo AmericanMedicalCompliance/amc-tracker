@@ -81,7 +81,7 @@
               +"#page-payroll .pr-wrap{overflow-x:auto;}";
               var st=document.createElement('style');st.id='payrollStyle';st.textContent=css;document.head.appendChild(st);
         }
-        function loadUsers(){try{return users.filter(function(u){return u.id>1;});}catch(e){return [];}}
+        function loadUsers(){try{return users.filter(function(u){return u.id>=1;});}catch(e){return [];}}
         function loadSessions(){if(window._allSessions&&window._allSessions.length>0)return window._allSessions;var out=[];Object.keys(localStorage).filter(function(k){return k==='amc_sessions'||k.startsWith('amc_sessions_');}).forEach(function(k){try{var d=JSON.parse(localStorage.getItem(k));var arr=Array.isArray(d)?d:(d&&d.sessions)||[];out=out.concat(arr);}catch(e){}});return out;}
         function hoursFor(uid,start,end){var s=loadSessions(),total=0;var sd=start?new Date(start):null,ed=end?new Date(end+'T23:59:59'):null;s.forEach(function(x){if(String(x.uid)!==String(uid))return;var d=new Date(x.date);if(sd&&d<sd)return;if(ed&&d>ed)return;total+=(Number(x.duration)||0);});return total/3600;}
         function money(n){return '$'+(Number(n)||0).toFixed(2);}
@@ -1026,8 +1026,8 @@ let rolePerms = {
 const PERM_LABELS = {view_all:'View all user data',edit_users:'Edit user profiles',delete_users:'Delete users',approve_leave:'Approve leave requests',adjust_time:'Adjust time records',view_reports:'View reports',manage_depts:'Manage departments',manage_shifts:'Manage shifts',config_alerts:'Configure HR alerts',push_n8n:'Push to n8n'};
 
 let users = [
-  {id:1,name:'Admin User',email:'amir@amedcompliance.com',role:'admin',pin:'0000',color:0,dept:2,shift:1,invited:true,status:'active',phone:'555-0100',jobTitle:'CISO and Director of HR',startDate:'2020-01-15',leaveBalance:{vacation:6,sick:4,personal:2, password: "Admin@123!", needsSetup: false},manager:null, password: "Admin@123!", needsSetup: false},
-{id:5,name:'Czarina Magana',email:'czarina.magana@amedcompliance.com',role:'employee',hourlyRate:8.625,pin:'1234',color:4,dept:1,shift:1,invited:true,status:'active',phone:'',jobTitle:'',startDate:'2026-05-13',leaveBalance:{vacation:6,sick:4,personal:2},manager:1, password: "", needsSetup: true},
+  {id:1,name:'Amir Rasul',email:'amir@amedcompliance.com',role:'admin',hourlyRate:12.5,pin:'0000',color:0,dept:2,shift:1,invited:true,status:'active',phone:'555-0100',jobTitle:'CISO and Director of HR',startDate:'2020-01-15',leaveBalance:{vacation:6,sick:4,personal:2, password: "Admin@123!", needsSetup: false},manager:null, password: "Admin@123!", needsSetup: false},
+{id:5,name:'Czarina Magana',email:'czarina.magana@amedcompliance.com',role:'employee',hourlyRate:8.62,pin:'1234',color:4,dept:1,shift:1,invited:true,status:'active',phone:'',jobTitle:'',startDate:'2026-05-13',leaveBalance:{vacation:6,sick:4,personal:2},manager:1, password: "", needsSetup: true},
 ];
 
 //        STARTUP: Apply deleted user blacklist + load extra users       
