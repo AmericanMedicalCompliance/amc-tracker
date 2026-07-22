@@ -11752,11 +11752,18 @@
     "project": "AMC Project",
     "category": "Work",
     "start": "2026-07-22T23:33:31.791Z",
-    "duration": 1,
+    "duration": 30,
     "date": "2026-07-22",
     "type": "tracked",
     "manual": false,
-    "screenshots": [],
+    "screenshots": [
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_5/269_1784763216429.jpg",
+        "time": "2026-07-22T23:33:36.429Z",
+        "mouse": 352,
+        "keys": 2
+      }
+    ],
     "url": null
   }
 ]
