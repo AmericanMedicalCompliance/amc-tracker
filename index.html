@@ -1566,69 +1566,31 @@ function fetchSessionsFromGitHub(){
 }
 
 // Sync this user's sessions to GitHub sessions.json
-function syncSessionsToGitHub(){
+  function syncSessionsToGitHub(){
   if(window._syncBusy) return;
   window._syncBusy = true;
-  // Safety: auto-unlock after 20 seconds to prevent permanent lock
   if(window._syncTimer) clearTimeout(window._syncTimer);
   window._syncTimer = setTimeout(function(){ window._syncBusy=false; }, 20000);
-  var _gp=localStorage.getItem('_amc_gp'); if(!_gp){window._syncBusy=false;console.warn('AMC sync: no PAT');return;} var pat=atob(_gp);
-  var owner='amedcompliance', repo='amc-tracker', path='sessions.json';
-  var _doWrite = function(data){
-    var existing=[];
-    if(data.content){ try{ existing=JSON.parse(atob(data.content.split('\n').join(''))); }catch(e){} }
-    // Capture URL from input field during active session
-    var _liveUrlIn=document.getElementById('urlInput');
-    if(curSess && _liveUrlIn && _liveUrlIn.value.trim() && !curSess.url){
-      var _luv=_liveUrlIn.value.trim();
-      try{_luv=new URL(_luv.indexOf('://')!==-1?_luv:'https://'+_luv).hostname;}catch(e){}
-      curSess.url=_luv;
-    }
-    var mySessions = sessions.filter(function(s){return s.uid===cu.id;}).map(function(s){
-      var ss2=(s.screenshots||[]).filter(function(sc){return sc.url&&!sc.url.startsWith('data:');}).map(function(sc){return {url:sc.url,time:sc.time instanceof Date?sc.time.toISOString():sc.time,mouse:sc.mouse||0,keys:sc.keys||0};});
-      return {id:s.id,uid:s.uid,project:s.project,category:s.category,start:s.start instanceof Date?s.start.toISOString():s.start,duration:s.duration,date:s.date,type:s.type||'tracked',manual:s.manual||false,screenshots:ss2,url:s.url||null};
-    });
-    var others=existing.filter(function(s){return s.uid!==cu.id;});
-    var existingMine=existing.filter(function(s){return s.uid===cu.id;});
-    var _myIds={}; mySessions.forEach(function(s){ _myIds[s.uid+'_'+s.id]=true; }); var _extraMine=existingMine.filter(function(s){ return !_myIds[s.uid+'_'+s.id]; }); var _allMerged=others.concat(mySessions).concat(_extraMine);
-    var _seenKeys={};
-    var merged=_allMerged.filter(function(s){
-      var _k=s.uid+'_'+s.id;
-      if(_seenKeys[_k]) return false;
-      _seenKeys[_k]=true;
-      // Auto-clean: skip zero-duration and artifact sessions >16h (57600s)
-      if(s.duration===0 || s.duration>57600) return false;
-      return true;
-    });
-    var encoded=btoa(unescape(encodeURIComponent(JSON.stringify(merged,null,2))));
-    var body={message:'Update sessions for uid '+cu.id+' [skip ci]',content:encoded};
-    if(data.sha) body.sha=data.sha;
-    return fetch('https://api.github.com/repos/'+owner+'/'+repo+'/contents/'+path,{
-      method:'PUT',
-      headers:{'Authorization':'token '+pat,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
-      body:JSON.stringify(body)
-    }).then(function(r){
-      if(r.status===409||r.status===422){
-        return fetch('https://api.github.com/repos/'+owner+'/'+repo+'/contents/'+path,{headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}})
-          .then(function(r2){return r2.json();})
-          .then(function(d2){return _doWrite(d2);});
-      }
-      if(r.status===403||r.status===429){
-        // Rate limited - retry after 10 seconds
-        window._syncBusy=false;
-        setTimeout(syncSessionsToGitHub, 10000);
-        return;
-      }
-      if(r&&r.ok){ console.log('Sessions synced ok'); }
-      window._syncBusy=false;
-    }).catch(function(e){console.warn('syncSessions PUT error',e);window._syncBusy=false;});
-  };
-  fetch('https://api.github.com/repos/'+owner+'/'+repo+'/contents/'+path,{
-    headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
-  }).then(function(r){return r.json();}).then(function(data){
-    _doWrite(data);
-  }).catch(function(e){console.warn('syncSessions GET error',e);window._syncBusy=false;});
-}
+  var _liveUrlIn=document.getElementById('urlInput');
+  if(curSess && _liveUrlIn && _liveUrlIn.value.trim() && !curSess.url){
+  var _luv=_liveUrlIn.value.trim();
+  try{_luv=new URL(_luv.indexOf('://')!==-1?_luv:'https://'+_luv).hostname;}catch(e){}
+  curSess.url=_luv;
+  }
+  var mySessions = sessions.filter(function(s){return s.uid===cu.id;}).map(function(s){
+  var ss2=(s.screenshots||[]).filter(function(sc){return sc.url&&!sc.url.startsWith('data:');}).map(function(sc){return {url:sc.url,time:sc.time instanceof Date?sc.time.toISOString():sc.time,mouse:sc.mouse||0,keys:sc.keys||0};});
+  return {id:s.id,uid:s.uid,project:s.project,category:s.category,start:s.start instanceof Date?s.start.toISOString():s.start,duration:s.duration,date:s.date,type:s.type||'tracked',manual:s.manual||false,screenshots:ss2,url:s.url||null};
+  });
+  fetch('/sync-sessions', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({ uid: cu.id, sessions: mySessions })
+  }).then(function(r){ return r.json(); }).then(function(res){
+  if(res && res.ok){ console.log('AMC: Synced sessions to GitHub via server function. Count: ' + res.count); window._syncBusy=false; }
+  else if(res && res.error==='RATE_LIMITED'){ window._syncBusy=false; setTimeout(syncSessionsToGitHub, 10000); }
+  else { console.warn('AMC sync sessions error:', res && res.error); window._syncBusy=false; }
+  }).catch(function(e){ console.warn('syncSessions error', e); window._syncBusy=false; });
+  }
 
 function updateMetrics(){
   if(!cu) return;
