@@ -89,7 +89,7 @@
         function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
         function renderPayroll(){
   (function(){
-    var anchor=new Date('2026-06-01'),today=new Date();
+    var anchor=new Date(Date.UTC(2026,5,1,7,0,0)),today=new Date();
     var diff=Math.max(0,Math.floor((today-anchor)/(14*86400000)));
     var ps=new Date(anchor.getTime()+diff*14*86400000),pe=new Date(ps.getTime()+13*86400000),pd=new Date(pe.getTime()+3*86400000);
     var fmt=function(d){return d.toISOString().split('T')[0];};
@@ -1154,17 +1154,21 @@ let mmode='', medit=null, webhookUrl='', activeAlerts=[];
 const pad = n => String(n).padStart(2,'0');
 const fmtS = s => { const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60; return `${pad(h)}:${pad(m)}:${pad(sc)}`; };
 const fmtHM = s => `${Math.floor(s/3600)}h ${Math.floor((s%3600)/60)}m`;
-function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function azDateStr(d){ d=d||new Date(); return d.toLocaleDateString('en-CA',{timeZone:'America/Phoenix'}); }
+function azParts(d){ var s=azDateStr(d); var p=s.split('-'); return {y:+p[0], m:+p[1], d:+p[2]}; }
+function azMidnight(d){ var p=azParts(d); return new Date(Date.UTC(p.y,p.m-1,p.d,7,0,0)); }
+function azDay(d){ return azMidnight(d).getUTCDay(); }
+function todayStr(){ return azDateStr(); }
 const ini = n => n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 const avStyle = i => { const c=AV_COLORS[i%AV_COLORS.length]; return `background:${c[0]};color:${c[1]}`; };
 function addAudit(uid,action,cat,detail){ auditLog.unshift({id:naudid++,uid,action,category:cat,detail,ts:new Date()}); }
 function dateRange(from,to){
   const res=[]; let d=new Date(from); const e=new Date(to);
-  while(d<=e){ if(d.getDay()!==0&&d.getDay()!==6) res.push(d.toISOString().slice(0,10)); d=new Date(d.getTime()+86400000); }
+  while(d<=e){ if(d.getUTCDay()!==0&&d.getUTCDay()!==6) res.push(d.toISOString().slice(0,10)); d=new Date(d.getTime()+86400000); }
   return res;
 }
-function mondayOf(d){ const dt=new Date(d); const day=dt.getDay()||7; dt.setDate(dt.getDate()-day+1); return dt.toISOString().slice(0,10); }
-function addDays(d,n){ const dt=new Date(d); dt.setDate(dt.getDate()+n); return dt.toISOString().slice(0,10); }
+function mondayOf(d){ const dt=new Date(d); const day=dt.getUTCDay()||7; dt.setUTCDate(dt.getUTCDate()-day+1); return dt.toISOString().slice(0,10); }
+function addDays(d,n){ const dt=new Date(d); dt.setUTCDate(dt.getUTCDate()+n); return dt.toISOString().slice(0,10); }
 
 //              LOGIN                                                                                                                                                                                                                                                                                                                                                                                                                               
 function buildLoginSelect(){
@@ -1646,17 +1650,16 @@ function renderDashboard(){
   document.getElementById('dash-leaves-count').textContent = pendingLeaves;
   
   // Active members (tracking today)
-  const today = new Date().toDateString();
-  const todaySess = allSess.filter(s=>new Date(s.start).toDateString()===today);
+  const today = azDateStr();
+  const todaySess = allSess.filter(s=>azDateStr(new Date(s.start))===today);
   const activeUids = [...new Set(todaySess.map(s=>s.uid))];
   document.getElementById('dash-active-count').textContent = activeUids.length;
   
   // Weekly stats
   const now = new Date();
-  const weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay());
-  weekStart.setHours(0,0,0,0);
+  const weekStart = azMidnight(now); weekStart.setUTCDate(weekStart.getUTCDate() - azDay(now));
   const weekSess = allSess.filter(s=>new Date(s.start)>=weekStart);
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthStart = (function(){var p=azParts(now); return new Date(Date.UTC(p.y,p.m-1,1,7,0,0));})();
   const monthSess = allSess.filter(s=>new Date(s.start)>=monthStart);
   var _dashPer = window._dashPeriod || 'today';
   var _dashDate = window._dashDate || null; var _dashSess = _dashPer==='date' && _dashDate ? allSess.filter(function(s){return s.start && s.start.substring(0,10)===_dashDate;}) : _dashPer==='week' ? weekSess : _dashPer==='month' ? monthSess : todaySess;
@@ -1818,7 +1821,7 @@ function renderActivity(expandUid){
       const totalSecs = uSess.reduce(function(a,s){return a+(s.duration||0);},0);
       const todaySecs = uSess.filter(function(s){return s.date===todayStr2;}).reduce(function(a,s){return a+(s.duration||0);},0);
       const weekSecs = uSess.filter(function(s){return new Date(s.start)>=(new Date(now-7*24*3600*1000));}).reduce(function(a,s){return a+(s.duration||0);},0);
-        const monthStart2 = new Date(now.getFullYear(), now.getMonth(), 1);
+        const monthStart2 = (function(){var p=azParts(now); return new Date(Date.UTC(p.y,p.m-1,1,7,0,0));})();
         const monthSecs = uSess.filter(function(s){return new Date(s.start)>=monthStart2;}).reduce(function(a,s){return a+(s.duration||0);},0);
         const periodSecs = _actPer==='date' && window._actDate ? uSess.filter(function(s){return s.start&&s.start.substring(0,10)===window._actDate;}).reduce(function(a,s){return a+(s.duration||0);},0) : _actPer==='today' ? todaySecs : _actPer==='month' ? monthSecs : weekSecs;
       const sessionCount = uSess.length;
@@ -1917,7 +1920,7 @@ function renderScreenshots() {
   var selUser = userFilter ? userFilter.value : '';
   var selDate = document.getElementById('ss-filter-date') ? document.getElementById('ss-filter-date').value : '';
   var now = new Date();
-  var todayStr = now.toDateString();
+  var todayStr = azDateStr(now);
   var weekAgo = new Date(now - 7*24*3600*1000);
   var monthAgo = new Date(now - 30*24*3600*1000);
   var allSS = [];
@@ -1927,7 +1930,7 @@ function renderScreenshots() {
     if (selUser && selUser !== String(s.uid)) return;
     (s.screenshots || []).forEach(function(ss) {
       var d = new Date(ss.time || ss.timestamp);
-      if (selDate === 'today' && d.toDateString() !== todayStr) return;
+      if (selDate === 'today' && azDateStr(d) !== todayStr) return;
       if (selDate === 'week' && d < weekAgo) return;
       if (selDate === 'month' && d < monthAgo) return;
       if (ss.url || ss.dataUrl) allSS.push({src: ss.url || ss.dataUrl, date: d, user: user, mouse: ss.mouse||0, keys: ss.keys||0});
@@ -2012,13 +2015,13 @@ function renderUrlActivity(){
   if(memberFilter) urlSessions=urlSessions.filter(function(s){return s.uid===memberFilter;});
   // Filter by date/period
   var now=new Date();
-  var todayS=now.toISOString().substring(0,10);
+  var todayS=azDateStr(now);
   if(dateFilter){
     urlSessions=urlSessions.filter(function(s){return s.date===dateFilter;});
   } else if(periodFilter==='today'){
     urlSessions=urlSessions.filter(function(s){return s.date===todayS;});
   } else if(periodFilter==='week'){
-    var wkStart=new Date(now); wkStart.setDate(now.getDate()-now.getDay()+1); var wkStr=wkStart.toISOString().substring(0,10);
+    var wkStart=azMidnight(now); wkStart.setUTCDate(wkStart.getUTCDate()-azDay(now)+1); var wkStr=azDateStr(wkStart);
     urlSessions=urlSessions.filter(function(s){return s.date&&s.date>=wkStr;});
   } else if(periodFilter==='month'){
     var moStr=todayS.substring(0,7);
@@ -2153,7 +2156,7 @@ function renderInsights(selectedUid){
           dm3[s.date]=(dm3[s.date]||0)+s.duration;
         });
         var ps3=Object.entries(pm3).sort(function(a,b){return b[1]-a[1];});
-        var last7=[]; for(var i2=6;i2>=0;i2--){ var d2=new Date(now-i2*24*3600*1000); var k2=d2.toISOString().slice(0,10); last7.push({label:d2.toLocaleDateString([],{weekday:'short',timeZone:'America/Phoenix'}),sec:dm3[k2]||0,isT:k2===td}); }
+        var last7=[]; for(var i2=6;i2>=0;i2--){ var d2=new Date(now-i2*24*3600*1000); var k2=azDateStr(d2); last7.push({label:d2.toLocaleDateString([],{weekday:'short',timeZone:'America/Phoenix'}),sec:dm3[k2]||0,isT:k2===td}); }
         setTimeout(function(){
           var pc=document.getElementById('adminPieChart'); var bc=document.getElementById('adminBarChart');
           if(pc&&ps3.length) new Chart(pc,{type:'doughnut',data:{labels:ps3.map(function(p){return p[0];}),datasets:[{data:ps3.map(function(p){return Math.round(p[1]/60);}),backgroundColor:ps3.map(function(_,i3){return CHART_COLORS[i3%CHART_COLORS.length];}),borderWidth:1,borderColor:'rgba(255,255,255,.3)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
@@ -2179,7 +2182,7 @@ function renderInsights(selectedUid){
   document.getElementById('projBars').innerHTML=ps.length?ps.map(function(entry,i){ var n=entry[0],sv=entry[1]; return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="font-size:12px;width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)">'+n+'</div><div style="flex:1"><div class="prog-wrap"><div class="prog-fill" style="width:'+Math.round(sv/tot*100)+'%;background:'+CHART_COLORS[i%CHART_COLORS.length]+'"></div></div></div><div style="font-size:11px;color:var(--text2);width:50px;text-align:right;font-family:var(--mono)">'+fmtHM(sv)+'</div></div>'; }).join(''):'<div style="color:var(--text3);font-size:13px;text-align:center;padding:12px">No data yet.</div>';
   if(pieO){pieO.destroy();pieO=null;}
   if(ps.length) pieO=new Chart(document.getElementById('pieChart'),{type:'doughnut',data:{labels:ps.map(function(p){return p[0];}),datasets:[{data:ps.map(function(p){return Math.round(p[1]/60);}),backgroundColor:ps.map(function(_,i){return CHART_COLORS[i%CHART_COLORS.length];}),borderWidth:1,borderColor:'rgba(255,255,255,.3)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.label+': '+fmtHM(ps[ctx.dataIndex][1]);}}}}}});
-  var last7=[]; for(var i=6;i>=0;i--){ var d=new Date(now-i*24*3600*1000); var k=d.toISOString().slice(0,10); last7.push({label:d.toLocaleDateString([],{weekday:'short',timeZone:'America/Phoenix'}),sec:dm[k]||0,isT:k===td}); }
+  var last7=[]; for(var i=6;i>=0;i--){ var d=new Date(now-i*24*3600*1000); var k=azDateStr(d); last7.push({label:d.toLocaleDateString([],{weekday:'short',timeZone:'America/Phoenix'}),sec:dm[k]||0,isT:k===td}); }
   if(barO){barO.destroy();barO=null;}
   barO=new Chart(document.getElementById('barChart'),{type:'bar',data:{labels:last7.map(function(d){return d.label;}),datasets:[{label:'Hours',data:last7.map(function(d){return parseFloat((d.sec/3600).toFixed(2));}),backgroundColor:last7.map(function(d){return d.isT?'#4a86a8':'#9FE1CB';}),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{callback:function(v){return v+'h';}}},x:{grid:{display:false}}}}});
 }
@@ -2244,7 +2247,7 @@ function renderHeatmap(rows,days){
   const show=days.slice(-21);
   let html=`<div style="overflow-x:auto"><div style="display:inline-flex;gap:0;flex-direction:column;min-width:max-content">`;
   html+=`<div style="display:flex;gap:3px;margin-bottom:4px;padding-left:110px">`;
-  show.forEach(d=>{ const dt=new Date(d); html+=`<div style="width:20px;font-size:9px;color:var(--text3);text-align:center">${dt.getDate()}</div>`; });
+  show.forEach(d=>{ const dt=new Date(d); html+=`<div style="width:20px;font-size:9px;color:var(--text3);text-align:center">${dt.getUTCDate()}</div>`; });
   html+=`</div>`;
   rows.forEach(({u,totalSec})=>{
     const us=sessions.filter(s=>s.uid===u.id&&s.duration>0);
@@ -2562,7 +2565,7 @@ function renderLeaveBalances() {
   // Stats
   const leaveReqs = JSON.parse(localStorage.getItem('amc_leave_requests')||'[]');
   const pending = leaveReqs.filter(r=>r.status==='pending').length;
-  const approvedThisMonth = leaveReqs.filter(r=>r.status==='approved' && r.from && r.from.startsWith(new Date().toISOString().substring(0,7))).length;
+  const approvedThisMonth = leaveReqs.filter(r=>r.status==='approved' && r.from && r.from.startsWith(azDateStr().substring(0,7))).length;
   const totalEmp = users.filter(u=>u.role!=='admin').length;
   const statsEl = document.getElementById('leave-stats-row');
   if (statsEl) {
@@ -2892,7 +2895,7 @@ function processApproval(aid,status){
   addAudit(cu.id,`Approval ${status}`,'Approval',`${a.type} for ${u?u.name:'?'}        ${status}`);
   // If approved time adjustment -> add as session
   if(status==='approved' && a.type==='Time Adjustment' && a.startTs && a.endTs){
-    const newSess={id:nsid++,uid:a.uid,start:a.startTs,end:a.endTs,duration:Math.round((a.endTs-a.startTs)/1000),date:new Date(a.startTs).toISOString().slice(0,10),project:a.note||'Manual entry',category:'Work',screenshots:[],manual:true};
+    const newSess={id:nsid++,uid:a.uid,start:a.startTs,end:a.endTs,duration:Math.round((a.endTs-a.startTs)/1000),date:azDateStr(new Date(a.startTs)),project:a.note||'Manual entry',category:'Work',screenshots:[],manual:true};
     sessions.push(newSess);
     saveSessions();
     const _mu=users.find(x=>x.id===a.uid);
@@ -2926,8 +2929,7 @@ function renderAdj(){
 // TIME ADJUSTMENTS PAGE
 window.taClearDate=taClearDate;window.renderTimeAdjPage=renderTimeAdjPage;window.taBarClick=taBarClick;window.taEditBlock=taEditBlock;window.taUpdateDurInput=taUpdateDurInput;window.taDeleteBtn=taDeleteBtn;window.taAddBtn=taAddBtn;window.taAddManual=taAddManual;
 function taClearDate(){
-  var d=new Date(); var mm=String(d.getMonth()+1).padStart(2,'0'); var dd=String(d.getDate()).padStart(2,'0');
-  document.getElementById('taDateSel').value=d.getFullYear()+'-'+mm+'-'+dd;
+  document.getElementById('taDateSel').value=azDateStr();
   renderTimeAdjPage();
 }
 function renderTimeAdjPage(){
@@ -3175,7 +3177,7 @@ function calcAlerts(){
     var schedDays=0, missed=0, expectedDailySec=0;
     if(shift && shift.days && shift.days.length){
       if(shift.start && shift.end){ var sp=shift.start.split(':'), ep=shift.end.split(':'); expectedDailySec=((+ep[0]*60+ +ep[1])-(+sp[0]*60+ +sp[1]))*60; }
-      for(var d=0; d<7; d++){ var dt=new Date(now - d*24*3600*1000); var dn=DAYMAP[dt.getDay()]; if(shift.days.indexOf(dn)!==-1){ schedDays++; var ds=dt.toISOString().slice(0,10); var worked=false; us.forEach(function(s){ if(s.date===ds) worked=true; }); if(!worked) missed++; } }
+      for(var d=0; d<7; d++){ var dt=new Date(now - d*24*3600*1000); var dn=DAYMAP[azDay(dt)]; if(shift.days.indexOf(dn)!==-1){ schedDays++; var ds=azDateStr(dt); var worked=false; us.forEach(function(s){ if(s.date===ds) worked=true; }); if(!worked) missed++; } }
     }
     var expectedWeekSec = expectedDailySec * schedDays;
     var scheduledPct = expectedWeekSec>0 ? Math.round(wk/expectedWeekSec*100) : 100;
@@ -4062,7 +4064,7 @@ function openManualTimeModal(){
   const ov = document.getElementById('manualTimeOverlay');
   if(!ov) return;
   // Set default date to today
-  var _d=new Date(); const today = _d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0')+'-'+String(_d.getDate()).padStart(2,'0');
+  var _d=new Date(); const today = azDateStr();
   const di = document.getElementById('mt_date');
   const si = document.getElementById('mt_start');
   const ei = document.getElementById('mt_end');
@@ -4213,14 +4215,14 @@ function drawDonutChart(canvasId, slices, total) {
 
 function renderDashboardCharts() {
   try {
-    var today = new Date();
+    var today = azMidnight();
     var days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
     var labels = [];
     var vals = [];
     for (var i = 6; i >= 0; i--) {
-      var d = new Date(today); d.setDate(today.getDate() - i);
-      labels.push(days[d.getDay()]);
-      var ds = d.toISOString().split("T")[0];
+      var d = new Date(today); d.setUTCDate(today.getUTCDate() - i);
+      labels.push(days[d.getUTCDay()]);
+      var ds = azDateStr(d);
       var dayTotal = (typeof sessions !== "undefined" ? sessions : []).filter(function(s){ return s.date === ds && s.uid && (typeof cu !== "undefined" ? s.uid === cu.id : true); }).reduce(function(a,s){ return a + (s.duration||0); }, 0);
       vals.push(dayTotal);
     }
@@ -4257,9 +4259,9 @@ function resumeActiveTimer(){
   try{
     var at=JSON.parse(localStorage.getItem('amc_active_timer')||'null');
     if(!at||!cu||at.uid!==cu.id||!at.startEpoch) return;
-    var todayStr=new Date().toISOString().slice(0,10);
+    var todayStr=azDateStr();
     var _hbGap=at.lastHeartbeat?Math.floor((Date.now()-at.lastHeartbeat)/1000):9999; var _elapsed=(_hbGap>120&&at.secs)?at.secs:Math.floor((Date.now()-at.startEpoch)/1000);
-    var _isDiffDay=new Date(at.startEpoch).toISOString().slice(0,10)!==todayStr;
+    var _isDiffDay=azDateStr(new Date(at.startEpoch))!==todayStr;
     if(_isDiffDay||_elapsed>57600){
       // Show user a choice instead of silently discarding
       var _hrs=Math.floor(_elapsed/3600), _mins=Math.floor((_elapsed%3600)/60);
@@ -4285,7 +4287,7 @@ function resumeActiveTimer(){
         var _pi=document.getElementById('projInput'), _cs=document.getElementById('catSelect');
         if(_pi&&_proj) _pi.value=_proj;
         if(_cs&&_cat) _cs.value=_cat;
-        curSess={id:nsid++,uid:cu.id,project:_proj,category:_cat,start:new Date(at.startEpoch),duration:secs,screenshots:[],date:new Date(at.startEpoch).toISOString().slice(0,10),type:'tracked',url:null};
+        curSess={id:nsid++,uid:cu.id,project:_proj,category:_cat,start:new Date(at.startEpoch),duration:secs,screenshots:[],date:azDateStr(new Date(at.startEpoch)),type:'tracked',url:null};
         sessions.push(curSess);
         localStorage.setItem('amc_active_timer',JSON.stringify({uid:cu.id,startEpoch:at.startEpoch,project:_proj,category:_cat}));
         document.getElementById('startBtn').disabled=false;
