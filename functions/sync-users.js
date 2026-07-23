@@ -73,7 +73,7 @@ export async function onRequestPost(context) {
 
     async function doWrite(attempt = 0) {
       // Get current file SHA (re-fetched on every attempt so retries use a fresh SHA)
-      const fileResp = await fetch(`${apiBase}/repos/${owner}/${repo}/contents/${file}`, {
+      const fileResp = await fetch(`${apiBase}/repos/${owner}/${repo}/contents/${file}?ref=classic-tracker`, {
         headers: {
           Authorization: `token ${pat}`,
           Accept: 'application/vnd.github.v3+json',
@@ -105,6 +105,7 @@ export async function onRequestPost(context) {
           message: `Update users.json (${usersToSave.length} users)`,
           content: encoded,
           sha: currentSha,
+          branch: 'classic-tracker',
         }),
       });
 
