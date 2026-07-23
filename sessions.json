@@ -11186,26 +11186,6 @@
     "url": null
   },
   {
-    "id": 294,
-    "uid": 24,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-07-23T16:26:14.794Z",
-    "duration": 750,
-    "date": "2026-07-23",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [
-      {
-        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_24/294_1784824011824.jpg",
-        "time": "2026-07-23T16:26:51.824Z",
-        "mouse": 636,
-        "keys": 2
-      }
-    ],
-    "url": null
-  },
-  {
     "id": 154,
     "uid": 10,
     "project": "AMC Project",
@@ -12965,5 +12945,25 @@
       }
     ],
     "url": "tracker.amclms.com"
+  },
+  {
+    "id": 294,
+    "uid": 24,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-07-23T16:26:14.794Z",
+    "duration": 765,
+    "date": "2026-07-23",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_24/294_1784824011824.jpg",
+        "time": "2026-07-23T16:26:51.824Z",
+        "mouse": 636,
+        "keys": 2
+      }
+    ],
+    "url": null
   }
 ]
