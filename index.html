@@ -1071,7 +1071,7 @@ function _showSyncWarning(msg) {
 
 async function fetchUsersFromGitHub() {
   try {
-    const url = 'https://raw.githubusercontent.com/amedcompliance/amc-tracker/main/users.json?t=' + Date.now();
+    const url = 'https://raw.githubusercontent.com/amedcompliance/amc-tracker/classic-tracker/users.json?t=' + Date.now();
     const r = await fetch(url);
     if (!r.ok) return;
     const data = await r.json();
@@ -1550,7 +1550,7 @@ function loadSessions(){
 
 // Fetch ALL sessions from GitHub (shared across devices)
 function fetchSessionsFromGitHub(){
-  var url = 'https://raw.githubusercontent.com/amedcompliance/amc-tracker/main/sessions.json?_='+Date.now();
+  var url = 'https://raw.githubusercontent.com/amedcompliance/amc-tracker/classic-tracker/sessions.json?_='+Date.now();
   fetch(url).then(function(r){ return r.ok ? r.json() : []; }).then(function(ghSessions){
     if(!Array.isArray(ghSessions)) return;
     var existingIds = sessions.map(function(s){return s.uid+'_'+s.id;});
@@ -1617,7 +1617,7 @@ const CAT_BADGE = {Work:'badge-teal',Design:'badge-blue',Dev:'badge-blue',Meetin
 
 var ghSessions = [];
 function fetchAndCacheGHSessions(callback) {
-  var url = 'https://raw.githubusercontent.com/amedcompliance/amc-tracker/main/sessions.json?_=' + Date.now();
+  var url = 'https://raw.githubusercontent.com/amedcompliance/amc-tracker/classic-tracker/sessions.json?_=' + Date.now();
   fetch(url).then(function(r) { return r.ok ? r.json() : []; }).then(function(data) {
     if (Array.isArray(data) && data.length > 0) {
       var _seen = {};
