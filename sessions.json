@@ -7757,45 +7757,6 @@
     "url": null
   },
   {
-    "id": 294,
-    "uid": 24,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-07-23T16:26:14.794Z",
-    "duration": 798,
-    "date": "2026-07-23",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 297,
-    "uid": 24,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-07-23T16:39:42.357Z",
-    "duration": 1800,
-    "date": "2026-07-23",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [
-      {
-        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_24/297_1784824790785.jpg",
-        "time": "2026-07-23T16:39:50.785Z",
-        "mouse": 253,
-        "keys": 2
-      },
-      {
-        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_24/297_1784825691298.jpg",
-        "time": "2026-07-23T16:54:51.298Z",
-        "mouse": 1953,
-        "keys": 0
-      }
-    ],
-    "url": null
-  },
-  {
     "id": 143,
     "uid": 15,
     "project": "AMC Project",
@@ -11857,5 +11818,44 @@
       }
     ],
     "url": "tracker.amclms.com"
+  },
+  {
+    "id": 294,
+    "uid": 24,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-07-23T16:26:14.794Z",
+    "duration": 798,
+    "date": "2026-07-23",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 297,
+    "uid": 24,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-07-23T16:39:42.357Z",
+    "duration": 1830,
+    "date": "2026-07-23",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_24/297_1784824790785.jpg",
+        "time": "2026-07-23T16:39:50.785Z",
+        "mouse": 253,
+        "keys": 2
+      },
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_24/297_1784825691298.jpg",
+        "time": "2026-07-23T16:54:51.298Z",
+        "mouse": 1953,
+        "keys": 0
+      }
+    ],
+    "url": null
   }
 ]
