@@ -1201,6 +1201,10 @@ function doLogin(){
   av.textContent = ini(u.name); av.style.cssText = avStyle(u.color);
   if(u.role==='admin'||u.role==='manager'){
     document.querySelectorAll('.admin-only').forEach(el=>el.style.display='');
+    if(u.role!=='admin'){
+      var _payrollNavEl2=document.getElementById('navPayroll'); if(_payrollNavEl2)_payrollNavEl2.style.display='none';
+      var _taNavEl2=document.getElementById('nav-timeAdjPage'); if(_taNavEl2)_taNavEl2.style.display='none';
+    }
   } else {
     var _isLead = teams.some(function(t){return t.lead===u.id;});
     if(_isLead){
@@ -3819,6 +3823,13 @@ function completeLogin(user) {
   // Show admin nav items if admin or manager
   if (u && (u.role === 'admin' || u.role === 'manager')) {
     document.querySelectorAll('.admin-only').forEach(function(el){ el.style.display = ''; });
+    // Payroll and Time Adjustments are restricted to admins only (not managers)
+    if (u.role !== 'admin') {
+      var _payrollNavEl = document.getElementById('navPayroll');
+      if (_payrollNavEl) _payrollNavEl.style.display = 'none';
+      var _taNavEl = document.getElementById('nav-timeAdjPage');
+      if (_taNavEl) _taNavEl.style.display = 'none';
+    }
   }
   
   // Hide login screen
