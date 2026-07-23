@@ -356,7 +356,7 @@
       "phone": "",
       "status": "active",
       "startDate": "2026-07-23",
-      "invited": false,
+      "invited": true,
       "manager": null,
       "leaveBalance": {
         "vacation": 6,
@@ -367,8 +367,31 @@
       "color": 5,
       "pin": "Gumral",
       "pwh": ""
+    },
+    {
+      "id": 24,
+      "name": "Portia Rose Rodriguez",
+      "email": "portia.rodriguez@amedcompliance.com",
+      "role": "employee",
+      "dept": 1,
+      "shift": 1,
+      "jobTitle": "e-Learning Design Specialist",
+      "phone": "",
+      "status": "active",
+      "startDate": "2026-07-23",
+      "invited": false,
+      "manager": null,
+      "leaveBalance": {
+        "vacation": 6,
+        "sick": 4,
+        "personal": 2
+      },
+      "needsSetup": true,
+      "color": 1,
+      "pin": "Gumral",
+      "pwh": ""
     }
   ],
-  "updated": "2026-07-23T15:33:24.731Z",
+  "updated": "2026-07-23T15:52:01.443Z",
   "note": "AMC Time Tracker user database. Managed automatically by the app."
 }
