@@ -38,7 +38,7 @@ try {
   const apiBase = 'https://api.github.com';
 
   async function doMergeAndWrite(attempt = 0) {
-    const fileResp = await fetch(`${apiBase}/repos/${owner}/${repo}/contents/${file}`, {
+    const fileResp = await fetch(`${apiBase}/repos/${owner}/${repo}/contents/${file}?ref=classic-tracker`, {
       headers: {
         Authorization: `token ${pat}`,
         Accept: 'application/vnd.github.v3+json',
@@ -96,6 +96,7 @@ try {
       message: `Update sessions for uid ${uid} [skip ci]`,
       content: encoded,
       sha: currentSha,
+      branch: 'classic-tracker',
     }),
   });
 
