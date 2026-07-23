@@ -20,7 +20,8 @@
       },
       "needsSetup": true,
       "color": 4,
-      "pin": "1234"
+      "pin": "1234",
+      "pwh": ""
     },
     {
       "id": 6,
@@ -42,7 +43,8 @@
       },
       "needsSetup": true,
       "color": 2,
-      "pin": "0000"
+      "pin": "0000",
+      "pwh": ""
     },
     {
       "id": 8,
@@ -64,7 +66,8 @@
       },
       "needsSetup": true,
       "color": 3,
-      "pin": "0000"
+      "pin": "0000",
+      "pwh": ""
     },
     {
       "id": 9,
@@ -86,7 +89,8 @@
       },
       "needsSetup": true,
       "color": 4,
-      "pin": "0000"
+      "pin": "0000",
+      "pwh": ""
     },
     {
       "id": 10,
@@ -108,7 +112,8 @@
       },
       "needsSetup": true,
       "color": 5,
-      "pin": "Gumral"
+      "pin": "Gumral",
+      "pwh": ""
     },
     {
       "id": 11,
@@ -129,8 +134,9 @@
         "personal": 2
       },
       "needsSetup": true,
-      "color": 0,
-      "pin": "Gumral"
+      "color": 1,
+      "pin": "Gumral",
+      "pwh": ""
     },
     {
       "id": 12,
@@ -152,7 +158,8 @@
       },
       "needsSetup": true,
       "color": 1,
-      "pin": "Gumral"
+      "pin": "Gumral",
+      "pwh": ""
     },
     {
       "id": 13,
@@ -174,7 +181,8 @@
       },
       "needsSetup": true,
       "color": 2,
-      "pin": "Gumral"
+      "pin": "Gumral",
+      "pwh": ""
     },
     {
       "id": 14,
@@ -196,7 +204,8 @@
       },
       "needsSetup": true,
       "color": 3,
-      "pin": "Gumral"
+      "pin": "Gumral",
+      "pwh": ""
     },
     {
       "id": 15,
@@ -218,7 +227,8 @@
       },
       "needsSetup": true,
       "color": 4,
-      "pin": "Gumral"
+      "pin": "Gumral",
+      "pwh": ""
     },
     {
       "id": 16,
@@ -240,7 +250,8 @@
       },
       "needsSetup": true,
       "color": 5,
-      "pin": "Gumral"
+      "pin": "Gumral",
+      "pwh": ""
     },
     {
       "id": 17,
@@ -253,7 +264,7 @@
       "phone": "",
       "status": "active",
       "startDate": "2026-06-08",
-      "invited": false,
+      "invited": true,
       "manager": null,
       "leaveBalance": {
         "vacation": 6,
@@ -261,8 +272,9 @@
         "personal": 2
       },
       "needsSetup": true,
-      "color": 0,
-      "pin": "Gumral"
+      "color": 1,
+      "pin": "Gumral",
+      "pwh": ""
     },
     {
       "id": 18,
@@ -284,9 +296,148 @@
       },
       "needsSetup": true,
       "color": 1,
-      "pin": "Gumral"
+      "pin": "Gumral",
+      "pwh": ""
+    },
+    {
+      "id": 21,
+      "name": "Hira Parvez",
+      "email": "hira@amedcompliance.com",
+      "role": "employee",
+      "dept": 1,
+      "shift": 1,
+      "jobTitle": "",
+      "phone": "",
+      "status": "active",
+      "startDate": "2026-07-22",
+      "invited": false,
+      "manager": null,
+      "leaveBalance": {
+        "vacation": 6,
+        "sick": 4,
+        "personal": 2
+      },
+      "needsSetup": true,
+      "color": 3,
+      "pin": "Gumral",
+      "pwh": ""
+    },
+    {
+      "id": 22,
+      "name": "Yawar Ali",
+      "email": "yawar@amedcompliance.com",
+      "role": "employee",
+      "dept": 2,
+      "shift": 1,
+      "jobTitle": "Director of Global Operations",
+      "phone": "",
+      "status": "active",
+      "startDate": "2026-07-23",
+      "invited": false,
+      "manager": null,
+      "leaveBalance": {
+        "vacation": 6,
+        "sick": 4,
+        "personal": 2
+      },
+      "needsSetup": true,
+      "color": 4,
+      "pin": "Gumral",
+      "pwh": ""
+    },
+    {
+      "id": 23,
+      "name": "Lorcel May Martin",
+      "email": "lorcel.martin@amedcompliance.com",
+      "role": "employee",
+      "dept": 1,
+      "shift": 1,
+      "jobTitle": "eLearning & Multimedia Specialist",
+      "phone": "",
+      "status": "active",
+      "startDate": "2026-07-23",
+      "invited": true,
+      "manager": null,
+      "leaveBalance": {
+        "vacation": 6,
+        "sick": 4,
+        "personal": 2
+      },
+      "needsSetup": true,
+      "color": 5,
+      "pin": "Gumral",
+      "pwh": ""
+    },
+    {
+      "id": 24,
+      "name": "Portia Rose Rodriguez",
+      "email": "portia.rodriguez@amedcompliance.com",
+      "role": "employee",
+      "dept": 1,
+      "shift": 1,
+      "jobTitle": "e-Learning Design Specialist",
+      "phone": "",
+      "status": "active",
+      "startDate": "2026-07-23",
+      "invited": true,
+      "manager": null,
+      "leaveBalance": {
+        "vacation": 6,
+        "sick": 4,
+        "personal": 2
+      },
+      "needsSetup": true,
+      "color": 1,
+      "pin": "Gumral",
+      "pwh": ""
+    },
+    {
+      "id": 25,
+      "name": "Rhea Cabanag",
+      "email": "rhea.cabanag@amedcompliance.com",
+      "role": "employee",
+      "dept": 2,
+      "shift": 1,
+      "jobTitle": "Operations Support",
+      "phone": "",
+      "status": "active",
+      "startDate": "2026-07-23",
+      "invited": false,
+      "manager": null,
+      "leaveBalance": {
+        "vacation": 6,
+        "sick": 4,
+        "personal": 2
+      },
+      "needsSetup": true,
+      "color": 1,
+      "pin": "Gumral",
+      "pwh": ""
+    },
+    {
+      "id": 26,
+      "name": "Ricky Cailao",
+      "email": "ricky.cailao@amedcompliance.com",
+      "role": "employee",
+      "dept": 4,
+      "shift": 1,
+      "jobTitle": "eLearning & Multimedia Specialist",
+      "phone": "",
+      "status": "active",
+      "startDate": "2026-07-23",
+      "invited": false,
+      "manager": null,
+      "leaveBalance": {
+        "vacation": 6,
+        "sick": 4,
+        "personal": 2
+      },
+      "needsSetup": true,
+      "color": 2,
+      "pin": "Gumral",
+      "pwh": ""
     }
   ],
-  "updated": "2026-06-18T19:18:44.793Z",
+  "updated": "2026-07-23T18:05:00.737Z",
   "note": "AMC Time Tracker user database. Managed automatically by the app."
 }
