@@ -11071,5 +11071,25 @@
       }
     ],
     "url": "tracker.amclms.com"
+  },
+  {
+    "id": 309,
+    "uid": 11,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-07-23T23:04:48.955Z",
+    "duration": 8,
+    "date": "2026-07-23",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_11/309_1784847889011.jpg",
+        "time": "2026-07-23T23:04:49.011Z",
+        "mouse": 854,
+        "keys": 0
+      }
+    ],
+    "url": null
   }
 ]
