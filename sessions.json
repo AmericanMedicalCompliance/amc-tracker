@@ -4662,52 +4662,6 @@
     "url": null
   },
   {
-    "id": 294,
-    "uid": 24,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-07-23T16:26:14.794Z",
-    "duration": 798,
-    "date": "2026-07-23",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 307,
-    "uid": 24,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-07-23T18:21:55.141Z",
-    "duration": 11173,
-    "date": "2026-07-23",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [],
-    "url": null
-  },
-  {
-    "id": 309,
-    "uid": 24,
-    "project": "AMC Project",
-    "category": "Work",
-    "start": "2026-07-23T19:37:03.664Z",
-    "duration": 11370,
-    "date": "2026-07-23",
-    "type": "tracked",
-    "manual": false,
-    "screenshots": [
-      {
-        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_24/309_1784835439495.jpg",
-        "time": "2026-07-23T19:37:19.495Z",
-        "mouse": 166,
-        "keys": 2
-      }
-    ],
-    "url": null
-  },
-  {
     "id": 162,
     "uid": 14,
     "project": "AMC Project",
@@ -12297,6 +12251,52 @@
         "time": "2026-07-23T19:25:58.183Z",
         "mouse": 1,
         "keys": 0
+      }
+    ],
+    "url": null
+  },
+  {
+    "id": 294,
+    "uid": 24,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-07-23T16:26:14.794Z",
+    "duration": 798,
+    "date": "2026-07-23",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 307,
+    "uid": 24,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-07-23T18:21:55.141Z",
+    "duration": 11173,
+    "date": "2026-07-23",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [],
+    "url": null
+  },
+  {
+    "id": 309,
+    "uid": 24,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-07-23T19:37:03.664Z",
+    "duration": 11400,
+    "date": "2026-07-23",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_24/309_1784835439495.jpg",
+        "time": "2026-07-23T19:37:19.495Z",
+        "mouse": 166,
+        "keys": 2
       }
     ],
     "url": null
