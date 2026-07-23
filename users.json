@@ -264,7 +264,7 @@
       "phone": "",
       "status": "active",
       "startDate": "2026-06-08",
-      "invited": false,
+      "invited": true,
       "manager": null,
       "leaveBalance": {
         "vacation": 6,
@@ -379,6 +379,29 @@
       "phone": "",
       "status": "active",
       "startDate": "2026-07-23",
+      "invited": true,
+      "manager": null,
+      "leaveBalance": {
+        "vacation": 6,
+        "sick": 4,
+        "personal": 2
+      },
+      "needsSetup": true,
+      "color": 1,
+      "pin": "Gumral",
+      "pwh": ""
+    },
+    {
+      "id": 25,
+      "name": "Rhea Cabanag",
+      "email": "rhea.cabanag@amedcompliance.com",
+      "role": "employee",
+      "dept": 2,
+      "shift": 1,
+      "jobTitle": "Operations Support",
+      "phone": "",
+      "status": "active",
+      "startDate": "2026-07-23",
       "invited": false,
       "manager": null,
       "leaveBalance": {
@@ -390,8 +413,31 @@
       "color": 1,
       "pin": "Gumral",
       "pwh": ""
+    },
+    {
+      "id": 26,
+      "name": "Ricky Cailao",
+      "email": "ricky.cailao@amedcompliance.com",
+      "role": "employee",
+      "dept": 4,
+      "shift": 1,
+      "jobTitle": "eLearning & Multimedia Specialist",
+      "phone": "",
+      "status": "active",
+      "startDate": "2026-07-23",
+      "invited": false,
+      "manager": null,
+      "leaveBalance": {
+        "vacation": 6,
+        "sick": 4,
+        "personal": 2
+      },
+      "needsSetup": true,
+      "color": 2,
+      "pin": "Gumral",
+      "pwh": ""
     }
   ],
-  "updated": "2026-07-23T15:52:01.443Z",
+  "updated": "2026-07-23T17:15:12.998Z",
   "note": "AMC Time Tracker user database. Managed automatically by the app."
 }
