@@ -4,6 +4,8 @@
 // Requires GITHUB_PAT environment variable set in Cloudflare Pages settings.
 
 export async function onRequestPost(context) {
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const MAX_RETRIES = 4;
   const { request, env } = context;
 
 const corsHeaders = {
@@ -35,7 +37,7 @@ try {
   const file = 'sessions.json';
   const apiBase = 'https://api.github.com';
 
-  async function doMergeAndWrite() {
+  async function doMergeAndWrite(attempt = 0) {
     const fileResp = await fetch(`${apiBase}/repos/${owner}/${repo}/contents/${file}`, {
       headers: {
         Authorization: `token ${pat}`,
@@ -45,8 +47,12 @@ try {
     });
 
   if (!fileResp.ok) {
-    return { error: 'Failed to fetch current sessions file', status: 500 };
-  }
+      if (attempt < MAX_RETRIES) {
+        await sleep(250 * Math.pow(2, attempt) + Math.random() * 150);
+        return doMergeAndWrite(attempt + 1);
+      }
+      return { error: 'Failed to fetch current sessions file', status: 500 };
+    }
 
   const fileData = await fileResp.json();
     const currentSha = fileData.sha;
@@ -95,15 +101,29 @@ try {
 
 
   if (updateResp.status === 409 || updateResp.status === 422) {
-    return doMergeAndWrite();
+    if (attempt < MAX_RETRIES) {
+      await sleep(250 * Math.pow(2, attempt) + Math.random() * 150);
+      return doMergeAndWrite(attempt + 1);
+    }
+    return { error: 'Too many conflicting writes, please try again', status: 409 };
   }
 
   if (updateResp.status === 403 || updateResp.status === 429) {
+    if (attempt < MAX_RETRIES) {
+      const retryAfterHeader = updateResp.headers.get('Retry-After');
+      const retryAfterMs = retryAfterHeader ? parseInt(retryAfterHeader, 10) * 1000 : (400 * Math.pow(2, attempt) + Math.random() * 200);
+      await sleep(retryAfterMs);
+      return doMergeAndWrite(attempt + 1);
+    }
     return { error: 'RATE_LIMITED', status: 429 };
   }
 
   if (!updateResp.ok) {
     const errText = await updateResp.text();
+    if (attempt < MAX_RETRIES) {
+      await sleep(250 * Math.pow(2, attempt) + Math.random() * 150);
+      return doMergeAndWrite(attempt + 1);
+    }
     return { error: 'GitHub update failed', details: errText, status: 500 };
   }
 
