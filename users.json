@@ -306,7 +306,7 @@
       "role": "employee",
       "dept": 1,
       "shift": 1,
-      "jobTitle": "Talent Acquisition Specialist",
+      "jobTitle": "",
       "phone": "",
       "status": "active",
       "startDate": "2026-07-22",
@@ -321,8 +321,31 @@
       "color": 3,
       "pin": "Gumral",
       "pwh": ""
+    },
+    {
+      "id": 22,
+      "name": "Yawar Ali",
+      "email": "yawar@amedcompliance.com",
+      "role": "manager",
+      "dept": 2,
+      "shift": 1,
+      "jobTitle": "Director of Global Operations",
+      "phone": "",
+      "status": "active",
+      "startDate": "2026-07-23",
+      "invited": false,
+      "manager": null,
+      "leaveBalance": {
+        "vacation": 6,
+        "sick": 4,
+        "personal": 2
+      },
+      "needsSetup": true,
+      "color": 4,
+      "pin": "Gumral",
+      "pwh": ""
     }
   ],
-  "updated": "2026-07-22T17:58:33.038Z",
+  "updated": "2026-07-23T15:07:55.016Z",
   "note": "AMC Time Tracker user database. Managed automatically by the app."
 }
