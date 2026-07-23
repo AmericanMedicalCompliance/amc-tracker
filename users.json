@@ -344,8 +344,31 @@
       "color": 4,
       "pin": "Gumral",
       "pwh": ""
+    },
+    {
+      "id": 23,
+      "name": "Lorcel May Martin",
+      "email": "lorcel.martin@amedcompliance.com",
+      "role": "employee",
+      "dept": 4,
+      "shift": 1,
+      "jobTitle": "eLearning & Multimedia Specialist",
+      "phone": "",
+      "status": "active",
+      "startDate": "2026-07-23",
+      "invited": false,
+      "manager": null,
+      "leaveBalance": {
+        "vacation": 6,
+        "sick": 4,
+        "personal": 2
+      },
+      "needsSetup": true,
+      "color": 5,
+      "pin": "Gumral",
+      "pwh": ""
     }
   ],
-  "updated": "2026-07-23T15:07:55.016Z",
+  "updated": "2026-07-23T15:33:24.731Z",
   "note": "AMC Time Tracker user database. Managed automatically by the app."
 }
