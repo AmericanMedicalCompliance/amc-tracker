@@ -326,7 +326,7 @@
       "id": 22,
       "name": "Yawar Ali",
       "email": "yawar@amedcompliance.com",
-      "role": "manager",
+      "role": "employee",
       "dept": 2,
       "shift": 1,
       "jobTitle": "Director of Global Operations",
@@ -438,6 +438,6 @@
       "pwh": ""
     }
   ],
-  "updated": "2026-07-23T17:15:12.998Z",
+  "updated": "2026-07-23T17:43:19.506Z",
   "note": "AMC Time Tracker user database. Managed automatically by the app."
 }
