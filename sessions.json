@@ -11995,5 +11995,25 @@
       }
     ],
     "url": null
+  },
+  {
+    "id": 270,
+    "uid": 16,
+    "project": "AMC Project",
+    "category": "Work",
+    "start": "2026-07-23T10:35:13.159Z",
+    "duration": 30,
+    "date": "2026-07-23",
+    "type": "tracked",
+    "manual": false,
+    "screenshots": [
+      {
+        "url": "https://pub-3da5c608eb734dd6a83d2efe4e650251.r2.dev/screenshots/uid_16/270_1784802916380.jpg",
+        "time": "2026-07-23T10:35:16.380Z",
+        "mouse": 119,
+        "keys": 0
+      }
+    ],
+    "url": null
   }
 ]
