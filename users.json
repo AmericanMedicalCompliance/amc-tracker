@@ -350,7 +350,7 @@
       "name": "Lorcel May Martin",
       "email": "lorcel.martin@amedcompliance.com",
       "role": "employee",
-      "dept": 1,
+      "dept": 4,
       "shift": 1,
       "jobTitle": "eLearning & Multimedia Specialist",
       "phone": "",
@@ -438,6 +438,6 @@
       "pwh": ""
     }
   ],
-  "updated": "2026-07-23T21:50:15.126Z",
+  "updated": "2026-07-24T14:17:19.222Z",
   "note": "AMC Time Tracker user database. Managed automatically by the app."
 }
