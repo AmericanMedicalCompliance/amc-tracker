@@ -1403,7 +1403,7 @@ function showInner(page, sec){  if(page==='admin'&&sec==='gusto'){setTimeout(gus
 async function startTimer(){
   const proj = document.getElementById('projInput').value.trim()||'Untitled';
   const cat = document.getElementById('catSelect').value;
-  secs=0; running=true; var _at=JSON.parse(localStorage.getItem('amc_active_timer')||'null'); if(_at&&cu&&_at.uid===cu.id&&_at.startEpoch){var _hbGap=_at.lastHeartbeat?Math.floor((Date.now()-_at.lastHeartbeat)/1000):9999;secs=(_hbGap>120&&_at.secs)?_at.secs:Math.max(0,Math.floor((Date.now()-_at.startEpoch)/1000));} localStorage.setItem('amc_active_timer',JSON.stringify({uid:cu.id,startEpoch:Date.now()-secs*1000,project:proj,category:cat}));
+  secs=0; running=true; var _at=JSON.parse(localStorage.getItem('amc_active_timer')||'null'); if(_at&&cu&&_at.uid===cu.id&&_at.startEpoch&&azDateStr(new Date(_at.startEpoch))===azDateStr()){var _hbGap=_at.lastHeartbeat?Math.floor((Date.now()-_at.lastHeartbeat)/1000):9999;secs=(_hbGap>120&&_at.secs)?_at.secs:Math.max(0,Math.floor((Date.now()-_at.startEpoch)/1000));} localStorage.setItem('amc_active_timer',JSON.stringify({uid:cu.id,startEpoch:Date.now()-secs*1000,project:proj,category:cat}));
   var _urlVal=document.getElementById('urlInput')?document.getElementById('urlInput').value.trim():''; var _urlHost=''; if(_urlVal){try{_urlHost=new URL(_urlVal.indexOf('://')!==-1?_urlVal:'https://'+_urlVal).hostname;}catch(e){_urlHost=_urlVal;}} curSess = {id:nsid++,uid:cu.id,project:proj,category:cat,start:new Date(),duration:0,screenshots:[],date:todayStr(),type:'tracked',url:_urlHost||null};
   sessions.push(curSess); setTimeout(syncSessionsToGitHub, 2000);
   saveSessions(); // sync online status immediately
@@ -4292,7 +4292,7 @@ function resumeActiveTimer(){
       document.body.appendChild(_overlay);
       document.getElementById('staleKeepBtn').onclick=function(){
         document.body.removeChild(_overlay);
-        secs=Math.max(0,_elapsed);
+        secs=_isDiffDay?0:Math.max(0,_elapsed);if(_isDiffDay){at.startEpoch=Date.now();}
         running=true;
         var _proj=at.project||'Untitled', _cat=at.category||'Work';
         var _pi=document.getElementById('projInput'), _cs=document.getElementById('catSelect');
